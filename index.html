@@ -4,281 +4,328 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Felt Life</title>
-<meta name="description" content="See your life in weeks, and how much of it you have felt.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23B8532A'/></svg>">
+<meta name="description" content="How much of your life have you already felt? See your weeks stretch into how they feel.">
+<meta property="og:title" content="How much of your life have you already felt?">
+<meta property="og:description" content="Three numbers. One grid of your weeks, drawn by how long they feel.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='2' y='1' width='12' height='7' rx='2' fill='%232E3BF0'/><rect x='2' y='10' width='12' height='2.5' rx='1.25' fill='%232E3BF0'/><rect x='2' y='14' width='12' height='1' rx='.5' fill='%232E3BF0'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F7F4EE;
-    --surface: #FFFDF9;
-    --ink: #1C1A17;
-    --ink-2: #4A463F;
-    --muted: #767066;
-    --line: #E3DDD2;
-    --line-2: #D2CBBE;
-    --accent: #B8532A;
-    --accent-soft: rgba(184, 83, 42, .14);
-    --faded: #C9C2B6;
-    --empty: #E9E3D8;
+    --ground: #ECEDF0;
+    --raised: #F6F7F9;
+    --ink: #1A1C22;
+    --ink-2: #464A56;
+    --muted: #666B7A;
+    --line: #D3D6DE;
+    --blue: #2E3BF0;
+    --on-blue: #FFFFFF;
+    --ahead: #D3D6DF;
+    --pre: #9AA2BC;
+    --tip-bg: #1A1C22;
+    --tip-fg: #ECEDF0;
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #141311; --surface: #1B1A17; --ink: #EDE8DF; --ink-2: #C4BDB1; --muted: #938C80;
-      --line: #2B2925; --line-2: #3A3732; --accent: #D9703F; --accent-soft: rgba(217, 112, 63, .18);
-      --faded: #4E4A43; --empty: #2A2824;
+    :root {
+      --ground: #16181E;
+      --raised: #1D2027;
+      --ink: #ECEDF1;
+      --ink-2: #BFC3CE;
+      --muted: #8A90A0;
+      --line: #2A2E38;
+      --blue: #6D78FF;
+      --on-blue: #0E1030;
+      --ahead: #2F3441;
+      --pre: #4A5063;
+      --tip-bg: #ECEDF1;
+      --tip-fg: #16181E;
     }
-  }
-  :root[data-theme="dark"] {
-    --bg: #141311; --surface: #1B1A17; --ink: #EDE8DF; --ink-2: #C4BDB1; --muted: #938C80;
-    --line: #2B2925; --line-2: #3A3732; --accent: #D9703F; --accent-soft: rgba(217, 112, 63, .18);
-    --faded: #4E4A43; --empty: #2A2824;
   }
 
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 400 17px/1.6 Inter, system-ui, -apple-system, sans-serif;
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: Anybody, system-ui, sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    font-stretch: 100%;
     -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
 
-  h1, h2, .serif { font-family: Fraunces, Georgia, serif; font-weight: 400; letter-spacing: -0.015em; }
-  h1 { font-size: clamp(38px, 7.5vw, 62px); line-height: 1.04; margin: 0 0 16px; font-weight: 300; }
-  h2 { font-size: clamp(26px, 4.6vw, 34px); line-height: 1.15; margin: 0 0 8px; }
-  p { margin: 0 0 12px; color: var(--ink-2); }
-  a { color: inherit; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
-  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
-  .accent { color: var(--accent); }
+  .shell { max-width: 1180px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 
-  header.top { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; font-size: 14px; }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 500; }
-  .brand i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-  .theme-btn { background: none; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
-
-  section { padding: 56px 0; }
-  .hero { padding: 48px 0 24px; }
-  .lede { font-size: 19px; max-width: 540px; }
-
-  /* Inputs */
-  .inputs { margin-top: 32px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .field { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 12px; transition: border-color .15s; }
-  .field:focus-within { border-color: var(--accent); }
-  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-2); }
-  .input-row { display: flex; align-items: baseline; gap: 6px; }
-  .field input {
-    width: 100%; min-width: 0; font: 400 36px/1.2 Fraunces, Georgia, serif; color: var(--ink);
-    background: transparent; border: 0; padding: 2px 0; -moz-appearance: textfield; appearance: textfield;
+  /* Header */
+  .bar { display: flex; justify-content: space-between; align-items: center; height: 68px; }
+  .mark { font-weight: 750; font-stretch: 135%; font-size: 17px; text-decoration: none; color: var(--ink); letter-spacing: -0.01em; }
+  .textbtn {
+    background: none; border: 0; padding: 8px 0; cursor: pointer; font-size: 16px; color: var(--ink-2);
+    text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 5px; text-decoration-thickness: 2px;
   }
-  .field input::-webkit-outer-spin-button, .field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .field input:focus { outline: none; }
-  .field .unit { font-size: 13px; color: var(--muted); white-space: nowrap; }
-  .error { color: var(--accent); font-size: 14px; min-height: 1.5em; margin: 10px 0 0; }
+  .textbtn:hover { color: var(--ink); text-decoration-color: var(--blue); }
 
-  /* Cards & stats */
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; margin-top: 24px; }
-  .headline { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 16px 0 4px; }
-  .big { font: 300 clamp(64px, 14vw, 112px)/0.95 Fraunces, Georgia, serif; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
-  .big.accent { color: var(--accent); }
-  .headline .cap { font-size: 16px; color: var(--ink-2); max-width: 300px; line-height: 1.4; }
-  .headline .cap b { color: var(--ink); font-weight: 600; }
+  /* Intro */
+  .intro { min-height: calc(100svh - 68px); display: flex; flex-direction: column; justify-content: center; padding-block: 24px 72px; }
+  h1 {
+    margin: 0 0 clamp(36px, 6vh, 64px);
+    font-weight: 780; font-size: clamp(40px, 12vw, 116px); line-height: .94; letter-spacing: -0.025em;
+  }
+  h1 span { display: block; }
+  .madlib { font-size: clamp(22px, 2.8vw, 34px); line-height: 1.6; font-weight: 400; color: var(--ink-2); }
+  .madlib p { margin: 0; }
+  .nw { white-space: nowrap; }
+  .madlib input {
+    font: inherit; font-weight: 750; font-stretch: 100%; color: var(--blue);
+    width: 2.4ch; text-align: center; padding: 0 2px; margin: 0 2px;
+    background: transparent; border: 0; border-bottom: 3px solid var(--blue); border-radius: 0;
+    -moz-appearance: textfield; appearance: textfield;
+  }
+  .madlib input::-webkit-outer-spin-button, .madlib input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .madlib input:focus { outline: none; background: color-mix(in srgb, var(--blue) 12%, transparent); }
+  .go {
+    margin-top: clamp(28px, 4vh, 44px); background: var(--blue); color: var(--on-blue); border: 0; cursor: pointer;
+    font-size: 19px; font-weight: 650; font-stretch: 115%; padding: 16px 28px; border-radius: 10px;
+    transition: transform .12s ease;
+  }
+  .go:active { transform: scale(.98); }
+  .error { color: var(--blue); font-size: 16px; min-height: 1.5em; margin: 14px 0 0; font-weight: 600; }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin-bottom: 14px; }
-  .legend span { display: inline-flex; align-items: center; gap: 7px; }
-  .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .sw.faded { background: var(--faded); }
-  .sw.lived { background: var(--ink); }
-  .sw.now { background: var(--accent); }
-  .sw.empty { box-shadow: inset 0 0 0 1.5px var(--line-2); }
-  #weeks { display: block; width: 100%; }
-  #compare { display: block; width: 100%; overflow: visible; }
+  /* Reveal */
+  .reveal { min-height: 100svh; display: grid; grid-template-columns: minmax(300px, 5fr) 7fr; gap: clamp(32px, 5vw, 72px); align-items: center; padding-block: 48px; }
+  .num {
+    font-size: clamp(72px, 9vw, 150px); font-size: min(172px, 24cqi); font-weight: 800; line-height: .82; letter-spacing: -0.03em;
+    font-stretch: 150%; color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap;
+    margin: 0 0 20px;
+  }
+  .cap { font-size: clamp(20px, 2vw, 26px); line-height: 1.3; margin: 0 0 32px; max-width: 17em; min-height: 2.6em; }
+  .switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+  .switch::before {
+    content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
+    background: var(--ink); border-radius: 999px; transition: transform .45s cubic-bezier(.65,0,.35,1);
+  }
+  .switch[data-mode="cal"]::before { transform: translateX(100%); }
+  .switch button {
+    position: relative; z-index: 1; background: none; border: 0; cursor: pointer; padding: 10px 20px;
+    font-size: 16px; font-weight: 600; border-radius: 999px; white-space: nowrap; transition: color .3s;
+  }
+  .switch button[aria-pressed="true"] { color: var(--ground); }
+  .key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 28px 0 0; padding: 0; list-style: none; font-size: 15px; color: var(--muted); }
+  .key li { display: inline-flex; align-items: center; gap: 8px; }
+  .key i { width: 14px; height: 8px; border-radius: 4px; display: inline-block; }
+  .readout { container-type: inline-size; min-width: 0; }
+  .plot { position: relative; min-width: 0; }
+  #grid { display: block; width: 100%; touch-action: pan-y; }
 
-  .aha { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 16px; color: var(--ink-2); }
-  .aha b { font-family: Fraunces, Georgia, serif; font-weight: 400; font-size: 20px; color: var(--ink); }
+  /* Story */
+  .beat { padding-block: clamp(96px, 18vh, 180px); }
+  .say { margin: 0; font-weight: 700; font-size: clamp(34px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.02em; max-width: 16em; }
+  .say span { display: block; }
+  .say .wide { font-stretch: 145%; }
+  .say .narrow { font-stretch: 58%; color: var(--ink-2); }
+  .aside { margin: 28px 0 0; font-size: clamp(19px, 1.8vw, 23px); color: var(--ink-2); max-width: 30em; }
+  .aside strong { color: var(--blue); font-weight: 700; }
 
+  /* Today */
+  .today h2 { margin: 0 0 12px; font-weight: 700; font-size: clamp(30px, 4vw, 52px); line-height: 1.05; letter-spacing: -0.02em; }
+  .checks { list-style: none; margin: 36px 0 0; padding: 0; border-top: 1.5px solid var(--ink); max-width: 820px; }
+  .checks li { border-bottom: 1px solid var(--line); }
+  .check {
+    display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start; width: 100%;
+    background: none; border: 0; text-align: left; cursor: pointer; padding: 22px 0;
+  }
+  .ring {
+    width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink-2); display: grid; place-items: center;
+    transition: background .25s, border-color .25s; margin-top: 2px;
+  }
+  .ring svg { width: 16px; height: 16px; opacity: 0; transform: scale(.6); transition: opacity .2s, transform .25s; }
+  .check .t { display: block; font-size: clamp(21px, 2.3vw, 28px); font-weight: 650; line-height: 1.15; transition: font-stretch .5s cubic-bezier(.65,0,.35,1), color .25s; }
+  .check .d { display: block; font-size: 16px; color: var(--muted); margin-top: 4px; }
+  .check[aria-pressed="true"] .ring { background: var(--blue); border-color: var(--blue); }
+  .check[aria-pressed="true"] .ring svg { opacity: 1; transform: none; }
+  .check[aria-pressed="true"] .t { font-stretch: 130%; color: var(--blue); }
+  .tally { margin: 20px 0 0; font-size: 17px; color: var(--muted); }
+
+  /* End */
+  .end { padding-block: clamp(110px, 22vh, 220px) clamp(80px, 14vh, 140px); }
+  .left { margin: 0; font-weight: 800; font-size: clamp(52px, 10vw, 150px); line-height: .9; letter-spacing: -0.03em; font-stretch: 62%; }
+  .left b { color: var(--blue); font-weight: 800; }
+  .end .aside { margin-top: 20px; }
+  .share { margin-top: 36px; background: none; border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 22px; font-size: 17px; font-weight: 600; cursor: pointer; }
+  .share:hover { background: var(--ink); color: var(--ground); }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 15px; color: var(--muted); }
+  footer .shell { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; align-items: center; }
+  footer a { color: inherit; }
+
+  /* Tooltip */
   .tip {
-    position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--bg);
-    font-size: 13px; line-height: 1.4; padding: 7px 10px; border-radius: 8px; opacity: 0;
-    transform: translate(-50%, calc(-100% - 10px)); transition: opacity .12s; white-space: nowrap;
+    position: fixed; z-index: 20; pointer-events: none; background: var(--tip-bg); color: var(--tip-fg);
+    font-size: 14px; line-height: 1.35; padding: 8px 11px; border-radius: 8px; white-space: nowrap;
+    transform: translate(-50%, calc(-100% - 12px)); opacity: 0; transition: opacity .12s;
   }
   .tip.on { opacity: 1; }
 
-  /* Today */
-  .today-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 24px; }
-  .todo {
-    display: flex; gap: 14px; align-items: flex-start; text-align: left; width: 100%;
-    background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px;
-    font: inherit; color: inherit; cursor: pointer; transition: border-color .15s, background .15s, transform .1s;
+  /* Method sheet */
+  dialog {
+    margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(600px, 100vw); max-width: 100vw;
+    border: 0; padding: 0; background: var(--raised); color: var(--ink);
   }
-  .todo:hover { border-color: var(--line-2); }
-  .todo:active { transform: scale(.99); }
-  .todo .box { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line-2); display: grid; place-items: center; margin-top: 2px; transition: all .2s; }
-  .todo .box svg { width: 13px; height: 13px; opacity: 0; transition: opacity .2s; }
-  .todo .t { font-weight: 600; font-size: 16px; display: block; }
-  .todo .d { font-size: 14px; color: var(--muted); display: block; margin-top: 2px; line-height: 1.45; }
-  .todo[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-  .todo[aria-pressed="true"] .box { background: var(--accent); border-color: var(--accent); }
-  .todo[aria-pressed="true"] .box svg { opacity: 1; }
+  dialog::backdrop { background: rgba(16, 18, 26, .45); }
+  dialog[open] { animation: slide .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slide { from { transform: translateX(40px); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { dialog[open] { animation: none; } }
+  .sheet { padding: 28px clamp(20px, 5vw, 44px) 56px; }
+  .sheet-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
+  .sheet h2 { margin: 0; font-size: 34px; font-weight: 750; font-stretch: 120%; letter-spacing: -0.02em; }
+  .sheet h3 { margin: 36px 0 10px; font-size: 21px; font-weight: 700; }
+  .sheet p, .sheet dd, .sheet li { font-size: 16px; color: var(--ink-2); line-height: 1.6; }
+  .sheet p { margin: 0 0 12px; }
+  .formula { font-size: 19px; font-weight: 600; color: var(--ink); background: var(--ground); border-radius: 10px; padding: 14px 16px; margin: 14px 0 16px; line-height: 1.45; }
+  .sheet dl { margin: 0; }
+  .sheet dt { font-weight: 700; margin-top: 16px; }
+  .sheet dd { margin: 4px 0 0; }
+  .sheet ol { padding-left: 20px; margin: 0; }
+  .sheet li { font-size: 14px; margin-bottom: 6px; color: var(--muted); }
 
-  .progress { margin-top: 20px; display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--muted); }
-  .dots { display: flex; gap: 6px; }
-  .dots i { width: 10px; height: 10px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-2); transition: background .2s, box-shadow .2s; }
-  .dots i.on { background: var(--accent); box-shadow: none; }
-
-  .closing { text-align: center; padding: 72px 0 64px; }
-  .closing .line { font: 300 clamp(28px, 5.4vw, 44px)/1.2 Fraunces, Georgia, serif; margin: 0 auto 24px; max-width: 620px; color: var(--ink); }
-  .btn { background: var(--ink); color: var(--bg); border: 0; border-radius: 999px; padding: 12px 22px; font: 500 15px Inter, sans-serif; cursor: pointer; }
-  .btn:hover { opacity: .88; }
-
-  /* Footer */
-  footer { border-top: 1px solid var(--line); padding: 40px 0 56px; }
-  footer h3 { font: 400 20px Fraunces, Georgia, serif; margin: 28px 0 10px; color: var(--ink); }
-  footer h3:first-child { margin-top: 0; }
-  footer p, footer li, footer dd { font-size: 14px; color: var(--muted); line-height: 1.6; }
-  footer dl { margin: 0; }
-  footer dt { font-size: 14px; font-weight: 600; color: var(--ink-2); margin-top: 12px; }
-  footer dd { margin: 2px 0 0; }
-  footer .eq { font: 400 17px Fraunces, Georgia, serif; color: var(--ink); margin: 6px 0 10px; }
-  footer ol { padding-left: 18px; margin: 8px 0 0; }
-  footer li { font-size: 13px; margin-bottom: 4px; }
-
-  @media (max-width: 640px) {
-    body { font-size: 16px; }
-    section { padding: 44px 0; }
-    .inputs { grid-template-columns: 1fr; }
-    .field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; }
-    .field label { flex: 1; }
-    .field .input-row { flex: none; width: 130px; }
-    .field input { font-size: 30px; text-align: right; }
-    .card { padding: 16px; }
-    .today-list { grid-template-columns: 1fr; }
+  @media (min-width: 901px) { h1 { font-size: clamp(40px, 8vw, 116px); } }
+  @media (max-width: 900px) {
+    body { font-size: 17px; }
+    .reveal { grid-template-columns: 1fr; gap: 28px; align-items: start; padding-top: 56px; }
+    .cap { margin-bottom: 24px; min-height: 0; }
+    .key { margin-top: 20px; }
+  }
+  @media (max-width: 480px) {
+    .switch button { padding: 10px 16px; font-size: 15px; }
+    .check { grid-template-columns: 40px 1fr; gap: 12px; }
   }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <header class="top">
-    <span class="brand"><i></i>The Felt Life</span>
-    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle color theme">Theme</button>
+<div class="shell">
+  <header class="bar">
+    <a class="mark" href="#top">The Felt Life</a>
+    <button class="textbtn" type="button" data-open-method>How it works</button>
   </header>
 </div>
 
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <h1>Your life in weeks,<br><em>and how it feels.</em></h1>
-      <p class="lede">Enter three numbers.</p>
-
-      <form class="inputs" id="form" novalidate onsubmit="return false">
-        <div class="field">
-          <label for="age">Your age</label>
-          <div class="input-row"><input id="age" type="number" inputmode="decimal" step="1" min="0" max="120" value="30"><span class="unit">yrs</span></div>
-        </div>
-        <div class="field">
-          <label for="life">Expected lifespan</label>
-          <div class="input-row"><input id="life" type="number" inputmode="decimal" step="1" min="2" max="120" value="80"><span class="unit">yrs</span></div>
-        </div>
-        <div class="field">
-          <label for="mem">Earliest memory at</label>
-          <div class="input-row"><input id="mem" type="number" inputmode="decimal" step="1" min="1" max="20" value="3"><span class="unit">yrs</span></div>
-        </div>
-      </form>
+  <section class="intro shell" id="top">
+    <h1>
+      <span style="font-stretch:62%">How much of your life</span>
+      <span style="font-stretch:100%">have you already</span>
+      <span style="font-stretch:150%">felt?</span>
+    </h1>
+    <form class="madlib" id="form" novalidate>
+      <p>I'm <input id="age" type="number" inputmode="decimal" min="0" max="120" step="1" value="30" aria-label="Your age in years">
+         and expect to live to <span class="nw"><input id="life" type="number" inputmode="decimal" min="2" max="120" step="1" value="80" aria-label="Expected lifespan in years">.</span></p>
+      <p>My earliest memory is from <span class="nw">age <input id="mem" type="number" inputmode="decimal" min="1" max="20" step="1" value="3" aria-label="Age of your earliest memory">.</span></p>
+      <button class="go" type="submit">Show my life</button>
       <p class="error" id="error" role="alert"></p>
-    </div>
+    </form>
   </section>
 
-  <!-- Graph 1 -->
-  <section style="padding-top:8px">
-    <div class="wrap">
-      <p class="eyebrow">01 · On the calendar</p>
-      <h2>Your life in weeks</h2>
-      <div class="headline">
-        <div class="big" id="bigClock">–</div>
-        <div class="cap" id="capClock"></div>
-      </div>
-      <div class="card">
-        <div class="legend">
-          <span><i class="sw faded"></i>Not remembered</span>
-          <span><i class="sw lived"></i>Lived</span>
-          <span><i class="sw now"></i>This week</span>
-          <span><i class="sw empty"></i>Ahead</span>
+  <div id="story" hidden>
+    <section class="reveal shell" id="reveal" aria-live="polite">
+      <div class="readout">
+        <p class="num" id="num">0%</p>
+        <p class="cap" id="cap"></p>
+        <div class="switch" id="switch" data-mode="felt" role="group" aria-label="Choose a view">
+          <button type="button" data-mode="felt" aria-pressed="true">How it feels</button>
+          <button type="button" data-mode="cal" aria-pressed="false">How it is</button>
         </div>
-        <canvas id="weeks" role="img" aria-label="One dot per week of your life, one row per year"></canvas>
+        <ul class="key">
+          <li><i style="background:var(--blue)"></i>Lived</li>
+          <li><i style="background:var(--ahead)"></i>Still ahead</li>
+          <li><i style="background:var(--pre)"></i>Before your first memory</li>
+        </ul>
       </div>
-    </div>
-  </section>
-
-  <!-- Graph 2 -->
-  <section>
-    <div class="wrap">
-      <p class="eyebrow">02 · In your head</p>
-      <h2>How much of your life you've felt</h2>
-      <div class="headline">
-        <div class="big accent" id="bigFelt">–</div>
-        <div class="cap" id="capFelt"></div>
+      <div class="plot">
+        <canvas id="grid" role="img" aria-label=""></canvas>
       </div>
-      <div class="card">
-        <svg id="compare" role="img" aria-label="The same years drawn by the calendar and by how they feel"></svg>
-        <p class="aha" id="aha"></p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Call to action -->
-  <section>
-    <div class="wrap">
-      <p class="eyebrow">03 · The good news</p>
-      <h2>Make the rest feel longer. <em>Start today.</em></h2>
-      <p>Looking back, a year feels as long as the memories it left. New, meaningful and shared moments stretch it out.</p>
+    <section class="beat shell" id="why">
+      <p class="say">
+        <span class="wide" id="whyThen"></span>
+        <span class="narrow" id="whyNow"></span>
+      </p>
+      <p class="aside" id="whyAside"></p>
+    </section>
 
-      <div class="today-list" id="todos">
-        <button class="todo" type="button" data-k="new" aria-pressed="false">
-          <span class="box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3"/></svg></span>
-          <span><span class="t">Do one new thing</span><span class="d">A new route, food or place. New memories make time last.</span></span>
-        </button>
-        <button class="todo" type="button" data-k="meaning" aria-pressed="false">
-          <span class="box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3"/></svg></span>
-          <span><span class="t">Spend an hour on what matters</span><span class="d">Something you care about enough to get lost in it.</span></span>
-        </button>
-        <button class="todo" type="button" data-k="people" aria-pressed="false">
-          <span class="box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3"/></svg></span>
-          <span><span class="t">Really connect with someone</span><span class="d">Call them, meet them, or do something together.</span></span>
-        </button>
-        <button class="todo" type="button" data-k="present" aria-pressed="false">
-          <span class="box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5l2.5 2.5L10 3"/></svg></span>
-          <span><span class="t">Be fully here for 5 minutes</span><span class="d">Put the phone away and notice what's around you.</span></span>
-        </button>
-      </div>
-      <div class="progress"><span class="dots" id="dots"><i></i><i></i><i></i><i></i></span><span id="progText">0 of 4 today</span></div>
-    </div>
+    <section class="beat shell">
+      <p class="say">The years that feel long are the ones full of memories.</p>
+      <p class="aside">You can't slow down the calendar, but you can fill it.</p>
+    </section>
 
-    <div class="closing wrap">
-      <p class="line" id="closeLine">This week is one of them. <em class="accent">Make it one you'll remember.</em></p>
-      <button class="btn" id="shareBtn" type="button">Copy link to my results</button>
-    </div>
-  </section>
+    <section class="beat today shell" style="padding-top:0">
+      <h2>Make today one you'll remember.</h2>
+      <ul class="checks">
+        <li><button class="check" type="button" data-k="new" aria-pressed="false">
+          <span class="ring"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--on-blue)"><path d="M3 8.5l3.2 3.2L13 5"/></svg></span>
+          <span><span class="t">Do one new thing</span><span class="d">A new route, dish or place. New experiences leave the most memories.</span></span>
+        </button></li>
+        <li><button class="check" type="button" data-k="meaning" aria-pressed="false">
+          <span class="ring"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--on-blue)"><path d="M3 8.5l3.2 3.2L13 5"/></svg></span>
+          <span><span class="t">Give an hour to what matters to you</span><span class="d">Something you care about enough to lose track of time.</span></span>
+        </button></li>
+        <li><button class="check" type="button" data-k="people" aria-pressed="false">
+          <span class="ring"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--on-blue)"><path d="M3 8.5l3.2 3.2L13 5"/></svg></span>
+          <span><span class="t">Really connect with someone</span><span class="d">Call, meet, or do something together. Those are the moments we keep.</span></span>
+        </button></li>
+        <li><button class="check" type="button" data-k="present" aria-pressed="false">
+          <span class="ring"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--on-blue)"><path d="M3 8.5l3.2 3.2L13 5"/></svg></span>
+          <span><span class="t">Be fully here for five minutes</span><span class="d">Phone away. You can only remember what you noticed.</span></span>
+        </button></li>
+      </ul>
+      <p class="tally" id="tally">0 of 4 done today</p>
+    </section>
+
+    <section class="end shell">
+      <p class="left" id="left"></p>
+      <p class="aside" id="leftAside">This is one of them.</p>
+      <button class="share" id="share" type="button">Copy link to my results</button>
+    </section>
+  </div>
 </main>
 
 <footer>
-  <div class="wrap">
-    <h3>How it's calculated</h3>
-    <p>If each year feels shorter in proportion to how long you've already lived (Janet, 1877), the share of your remembered life that you've felt is:</p>
-    <div class="eq">ln(age ÷ first memory) ÷ ln(lifespan ÷ first memory)</div>
-    <p>This is a model, not a measurement. People don't feel days going faster as they age, but they do say decades pass faster. Weeks are counted as 52.18 per year. Nothing you enter leaves your browser.</p>
+  <div class="shell">
+    <button class="textbtn" type="button" data-open-method>How it works and sources</button>
+    <span>Inspired by Tim Urban's Life in Weeks and <a href="https://weeksoflife.com/" rel="noopener">weeksoflife.com</a>.</span>
+  </div>
+</footer>
 
-    <h3>The research behind "make it feel longer"</h3>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<dialog id="method" aria-labelledby="methodTitle">
+  <div class="sheet">
+    <div class="sheet-top">
+      <h2 id="methodTitle">How it works</h2>
+      <button class="textbtn" type="button" id="closeMethod">Close</button>
+    </div>
+    <p>A year feels as long as the share of your life it makes up. At 5, a year is a fifth of everything you've lived. At 50, it's a fiftieth. The philosopher Paul Janet described this in 1877.</p>
+    <p>Add up a lifetime of shrinking years and you get a logarithm. The count starts at your earliest memory, because that's where the life you can look back on begins:</p>
+    <div class="formula">felt so far = ln(age ÷ first memory) ÷ ln(lifespan ÷ first memory)</div>
+    <p>It's a way of seeing your life, not a measurement. People don't feel days speeding up with age, but most say the years and decades do.</p>
+    <p>Everything is calculated in your browser. Nothing you enter is sent anywhere.</p>
+
+    <h3>Why those four things help</h3>
     <dl>
-      <dt>Novelty</dt>
-      <dd>Looking back, we judge time by how many distinct memories it left. Routine shortens time in retrospect, and new experiences lengthen it: a new trip flies by while you're on it and then feels long when you remember it (Avni-Babad &amp; Ritov, 2003; Hammond, 2012). Most people's best-remembered years are from their teens and twenties, when so much happened for the first time (Rubin et al., 1998).</dd>
-      <dt>Fulfillment</dt>
-      <dd>Absorbing, meaningful work leads to "flow" and leaves memories behind (Csikszentmihalyi, 1990). In experiments, moments of awe made people feel they had more time available (Rudd, Vohs &amp; Aaker, 2012).</dd>
-      <dt>Relationships</dt>
-      <dd>In the Harvard Study of Adult Development, which has run for more than 85 years, relationship quality was the strongest predictor of health and happiness later in life (Waldinger &amp; Schulz, 2023). Emotional moments are also remembered more strongly (McGaugh, 2004).</dd>
-      <dt>Presence</dt>
-      <dd>In one large study, minds wandered during nearly half of waking hours, and people were less happy when they did (Killingsworth &amp; Gilbert, 2010). People who had just meditated judged time intervals as longer (Kramer, Weger &amp; Sharma, 2013).</dd>
+      <dt>Something new</dt>
+      <dd>Looking back, we judge how long a stretch of time was by how many distinct memories it left. Routine makes time shrink in hindsight, and new experiences stretch it. A new trip flies by while you're on it, then feels long when you remember it. Most people remember their teens and twenties best, when so much happened for the first time.</dd>
+      <dt>What matters to you</dt>
+      <dd>Absorbing, meaningful work puts you in "flow": the hours disappear, but what you did stays with you. In experiments, moments of awe made people feel they had more time available.</dd>
+      <dt>Other people</dt>
+      <dd>The Harvard Study of Adult Development has followed its participants for more than 85 years. The quality of their relationships predicted health and happiness later in life better than anything else the study measured. Emotional moments are also remembered more strongly.</dd>
+      <dt>Being present</dt>
+      <dd>In one large study, people's minds wandered during nearly half of their waking hours, and they were less happy when that happened. People who had just meditated judged time intervals as longer.</dd>
     </dl>
 
     <h3>Sources</h3>
@@ -296,274 +343,347 @@
       <li>Killingsworth, M. A. &amp; Gilbert, D. T. (2010). A wandering mind is an unhappy mind. <em>Science</em>, 330, 932.</li>
       <li>Kramer, R. S. S., Weger, U. W. &amp; Sharma, D. (2013). The effect of mindfulness meditation on time perception. <em>Consciousness and Cognition</em>, 22, 846–852.</li>
     </ol>
-    <p style="margin-top:20px">Inspired by Tim Urban's "Your Life in Weeks" and <a href="https://weeksoflife.com/" rel="noopener">weeksoflife.com</a>.</p>
   </div>
-</footer>
-
-<div class="tip" id="tip" role="tooltip"></div>
+</dialog>
 
 <script>
 (() => {
   const WPY = 52.1775;
   const $ = id => document.getElementById(id);
   const fmt = n => Math.round(n).toLocaleString('en-US');
-  const pct = n => Math.round(n * 100) + '%';
-  const yrs = n => (Math.round(n * 10) / 10).toString();
-  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const NS = 'http://www.w3.org/2000/svg';
-  const el = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const tip = $('tip');
-  let state = null;
+  const clamp01 = x => Math.min(1, Math.max(0, x));
+  const ease = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
 
-  // ---------- Theme ----------
-  const themeKey = 'felt-life-theme';
-  try { const t = localStorage.getItem(themeKey); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-  $('themeBtn').addEventListener('click', () => {
-    const cur = document.documentElement.dataset.theme;
-    const dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
-    try { localStorage.setItem(themeKey, document.documentElement.dataset.theme); } catch (e) {}
-    drawAll();
-  });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawAll);
+  let S = null;        // current model
+  let t = 1;           // 1 = how it feels, 0 = how it is
+  let sweep = 1;       // 0..1 progress of the first fill
+  let played = false;
 
   // ---------- Model ----------
   function model(age, life, mem) {
     const clamp = x => Math.min(1, Math.max(0, x));
-    const felt = a => a <= mem ? 0 : clamp(Math.log(a / mem) / Math.log(life / mem));
-    const cal = a => clamp((a - mem) / (life - mem));
     const totalWeeks = Math.round(life * WPY);
     return {
-      age, life, mem, felt, cal, totalWeeks,
+      age, life, mem, totalWeeks,
       livedWeeks: Math.min(Math.floor(age * WPY), totalWeeks),
       memWeeks: Math.floor(mem * WPY),
+      felt: a => a <= mem ? 0 : clamp(Math.log(a / mem) / Math.log(life / mem)),
+      clock: a => clamp(a / life),
     };
   }
 
-  function readInputs() {
+  function read() {
     const age = parseFloat($('age').value), life = parseFloat($('life').value), mem = parseFloat($('mem').value);
     if ([age, life, mem].some(v => !isFinite(v))) return { err: 'Fill in all three numbers.' };
-    if (age < 0 || age > 120) return { err: 'Age should be between 0 and 120.' };
-    if (life < 2 || life > 120) return { err: 'Lifespan should be between 2 and 120.' };
-    if (mem < 1 || mem > 20) return { err: 'Earliest memory should be between 1 and 20.' };
-    if (mem >= life) return { err: 'Your earliest memory has to come before your expected lifespan ends.' };
+    if (age < 0 || age > 120) return { err: 'Enter an age between 0 and 120.' };
+    if (life < 2 || life > 120) return { err: 'Enter a lifespan between 2 and 120.' };
+    if (mem < 1 || mem > 20) return { err: 'Enter an earliest memory between age 1 and 20.' };
+    if (mem >= life) return { err: 'Your earliest memory has to come before the lifespan you expect.' };
     return { age, life, mem };
   }
 
-  let t;
-  ['age', 'life', 'mem'].forEach(id => $(id).addEventListener('input', () => { clearTimeout(t); t = setTimeout(update, 120); }));
+  // ---------- Inputs ----------
+  const inputs = ['age', 'life', 'mem'].map($);
+  const fit = el => el.style.width = (Math.max(2, String(el.value).length) + 0.5) + 'ch';
+  let deb;
+  inputs.forEach(el => {
+    fit(el);
+    el.addEventListener('input', () => {
+      fit(el);
+      if (!S) return;
+      clearTimeout(deb);
+      deb = setTimeout(() => apply(false), 150);
+    });
+  });
 
-  function update() {
-    const r = readInputs();
+  $('form').addEventListener('submit', e => {
+    e.preventDefault();
+    if (apply(true)) $('reveal').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+  });
+
+  function apply(fresh) {
+    const r = read();
     $('error').textContent = r.err || '';
-    if (r.err) return;
-    const prev = state;
-    state = model(r.age, r.life, r.mem);
+    if (r.err) return false;
+    S = model(r.age, r.life, r.mem);
     try { history.replaceState(null, '', `#age=${r.age}&life=${r.life}&mem=${r.mem}`); } catch (e) {}
-    writeCopy(prev);
-    drawAll();
-  }
-
-  // ---------- Count-up ----------
-  function countTo(node, from, to) {
-    if (reduced || from === to) { node.textContent = Math.round(to * 100) + '%'; return; }
-    const t0 = performance.now(), dur = 600;
-    const step = now => {
-      const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
-      node.textContent = Math.round((from + (to - from) * e) * 100) + '%';
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+    const story = $('story');
+    if (story.hidden) { story.hidden = false; }
+    if (fresh && !played) { sweep = 0; }
+    size();
+    words();
+    draw();
+    return true;
   }
 
   // ---------- Copy ----------
-  function writeCopy(prev) {
-    const s = state;
+  const ORD = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth'];
+  const TENS = { 2: ['twenty', 'twentieth'], 3: ['thirty', 'thirtieth'], 4: ['forty', 'fortieth'], 5: ['fifty', 'fiftieth'], 6: ['sixty', 'sixtieth'], 7: ['seventy', 'seventieth'], 8: ['eighty', 'eightieth'], 9: ['ninety', 'ninetieth'] };
+  function share(n) {
+    n = Math.max(1, Math.round(n));
+    if (n === 1) return 'all';
+    if (n === 2) return 'half';
+    let w;
+    if (n < 20) w = ORD[n];
+    else if (n < 100) w = n % 10 ? `${TENS[Math.floor(n / 10)][0]}-${ORD[n % 10]}` : TENS[n / 10][1];
+    else if (n === 100) w = 'hundredth';
+    else return `1/${n}`;
+    return (/^[aeio]/.test(w) ? 'an ' : 'a ') + w;
+  }
+  const yrs = n => String(Math.round(n * 10) / 10);
+
+  function words() {
+    const s = S;
+    const m = Math.max(1, Math.round(s.mem)), a = Math.round(s.age);
+    if (s.age > s.mem + 0.5) {
+      $('whyThen').textContent = `At ${m}, a year was ${share(m)} of your life.`;
+      $('whyNow').textContent = `At ${a}, it's ${share(a)}.`;
+      const wk = 52 * s.mem / s.age;
+      $('whyAside').innerHTML = `So this year will pass about as fast as <strong>${wk < 10 ? wk.toFixed(1) : Math.round(wk)} weeks</strong> did when you were ${yrs(s.mem)}.`;
+    } else {
+      $('whyThen').textContent = `Right now, a year is a big part of your life.`;
+      $('whyNow').textContent = `It won't always feel that way.`;
+      $('whyAside').textContent = `Each year is compared with everything you've lived before it, so each one feels a little shorter than the last.`;
+    }
     const left = Math.max(0, s.totalWeeks - s.livedWeeks);
-    const clock = Math.min(1, s.age / s.life);
-    const felt = s.felt(s.age), cal = s.cal(s.age);
-
-    countTo($('bigClock'), prev ? Math.min(1, prev.age / prev.life) : 0, clock);
-    $('capClock').innerHTML = left > 0
-      ? `of your weeks lived.<br><b>${fmt(s.livedWeeks)}</b> behind you, <b>${fmt(left)}</b> ahead.`
-      : `You've passed your estimate.<br>Every week now is a <b>bonus</b>.`;
-
-    countTo($('bigFelt'), prev ? prev.felt(prev.age) : 0, felt);
-    $('capFelt').innerHTML = s.age <= s.mem
-      ? `felt so far. Your remembered life hasn't started yet.`
-      : `of your remembered life already feels lived, though only <b>${pct(cal)}</b> of it has passed.`;
-
-    const wk = 52 * s.mem / Math.max(s.age, s.mem);
-    $('aha').innerHTML = s.age > s.mem
-      ? `<b>Why?</b> Each year is a smaller slice of everything you've lived. A year at ${yrs(s.age)} feels about as long as <b>${wk < 10 ? wk.toFixed(1) : Math.round(wk)} weeks</b> did when you were ${yrs(s.mem)}.`
-      : `<b>Why?</b> Early years feel huge because each one is a big slice of everything you've lived.`;
-
-    $('closeLine').innerHTML = left > 0
-      ? `You have about ${fmt(left)} weeks left. <em class="accent">Make this one worth remembering.</em>`
-      : `Every week from here is extra. <em class="accent">Make this one worth remembering.</em>`;
+    if (left > 0) {
+      $('left').innerHTML = `<b>${fmt(left)}</b> weeks left.`;
+      $('leftAside').textContent = 'This is one of them.';
+    } else {
+      $('left').innerHTML = `Every week is <b>extra</b> now.`;
+      $('leftAside').textContent = 'Including this one.';
+    }
+    const f = Math.round(s.felt(s.age) * 100), c = Math.round(s.clock(s.age) * 100);
+    $('grid').setAttribute('aria-label', `A grid of your weeks. By how it feels, ${f}% of the life you remember is behind you. By the calendar, ${c}% of your weeks have passed.`);
   }
 
-  // ---------- Graph 1: weeks grid ----------
-  const cv = $('weeks');
-  let geo = null;
-  function drawGrid() {
-    const s = state;
-    const rows = Math.ceil(s.life), cols = 52;
-    const W = cv.parentElement.clientWidth - parseFloat(getComputedStyle(cv.parentElement).paddingLeft) * 2;
-    const labelW = W < 420 ? 20 : 28;
-    const cell = (W - labelW) / cols;
-    const r = Math.max(1, cell * 0.34);
-    const H = Math.ceil(rows * cell);
+  function readout() {
+    const s = S, ageS = s.age * sweep;
+    const v = s.clock(ageS) + (s.felt(ageS) - s.clock(ageS)) * t;
+    const num = $('num');
+    num.textContent = Math.round(v * 100) + '%';
+    num.style.fontStretch = (60 + 90 * t) + '%';
+    let cap;
+    if (t >= .5) {
+      cap = s.age <= s.mem ? `Your remembered life hasn't started yet. It's all ahead of you.`
+        : s.age >= s.life ? `of the life you expected already feels lived. Every week now is extra.`
+        : `of the life you remember already feels lived.`;
+    } else {
+      cap = s.age >= s.life ? `of the weeks you expected have passed. You're in bonus time.` : `of your weeks have actually passed.`;
+    }
+    const capEl = $('cap');
+    if (capEl.textContent !== cap) capEl.textContent = cap;
+  }
+
+  // ---------- Grid ----------
+  const cv = $('grid'), ctx = cv.getContext('2d');
+  let W = 0, H = 0, lastW = 0, rows = [];
+  const GUT = 40;
+
+  function size() {
+    const w = cv.parentElement.clientWidth;
+    if (w === lastW && H) return;
+    lastW = w; W = w;
+    const narrow = innerWidth < 900;
+    H = Math.round(narrow ? Math.min(620, Math.max(380, innerHeight * 0.62)) : Math.min(800, Math.max(460, innerHeight * 0.8)));
     const dpr = window.devicePixelRatio || 1;
-    cv.width = W * dpr; cv.height = H * dpr; cv.style.height = H + 'px';
-    const ctx = cv.getContext('2d');
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const cInk = css('--ink'), cFaded = css('--faded'), cEmpty = css('--line-2'), cAcc = css('--accent'), cMuted = css('--muted');
-    ctx.font = `${W < 420 ? 9 : 10}px Inter, sans-serif`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-    for (let y = 0; y < rows; y++) {
-      const cy = y * cell + cell / 2;
-      if (y % 10 === 0) { ctx.fillStyle = cMuted; ctx.fillText(y, labelW - 7, cy); }
-      for (let w = 0; w < cols; w++) {
-        const idx = Math.round(y * WPY) + w;
-        if (idx >= s.totalWeeks) continue;
-        const cx = labelW + w * cell + cell / 2;
-        ctx.beginPath();
-        if (idx === s.livedWeeks) { ctx.arc(cx, cy, r * 1.35, 0, 7); ctx.fillStyle = cAcc; ctx.fill(); }
-        else if (idx < s.livedWeeks) { ctx.arc(cx, cy, r, 0, 7); ctx.fillStyle = idx < s.memWeeks ? cFaded : cInk; ctx.fill(); }
-        else { ctx.arc(cx, cy, r - 0.5, 0, 7); ctx.strokeStyle = cEmpty; ctx.lineWidth = 1; ctx.stroke(); }
-      }
-    }
-    geo = { labelW, cell, rows };
   }
-  cv.addEventListener('mousemove', e => {
-    if (!geo) return;
-    const b = cv.getBoundingClientRect();
-    const col = Math.floor((e.clientX - b.left - geo.labelW) / geo.cell), row = Math.floor((e.clientY - b.top) / geo.cell);
-    const idx = Math.round(row * WPY) + col;
-    if (col < 0 || col > 51 || row < 0 || row >= geo.rows || idx >= state.totalWeeks) return hideTip();
-    const status = idx === state.livedWeeks ? 'This week' : idx < state.memWeeks ? 'Lived, not remembered' : idx < state.livedWeeks ? 'Lived' : 'Ahead';
-    showTip(e.clientX, b.top + row * geo.cell, `<b>Age ${row}, week ${col + 1}</b> · ${status}`);
-  });
-  cv.addEventListener('mouseleave', hideTip);
 
-  // ---------- Graph 2: calendar vs felt ----------
-  function drawCompare() {
-    const s = state, svg = $('compare');
-    svg.innerHTML = '';
-    const card = svg.parentElement;
-    const W = card.clientWidth - parseFloat(getComputedStyle(card).paddingLeft) * 2;
-    const small = W < 420;
-    const barH = small ? 26 : 32, gap = small ? 64 : 84;
-    const y1 = 26, y2 = y1 + barH + gap, H = y2 + barH + 28;
-    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
-
-    const Xc = a => (a - s.mem) / (s.life - s.mem) * W;
-    const Xf = a => Math.log(a / s.mem) / Math.log(s.life / s.mem) * W;
-    const cAcc = css('--accent'), cEmpty = css('--empty'), cMuted = css('--muted'), cInk = css('--ink'), cSurf = css('--surface'), cSoft = css('--accent-soft'), cLine = css('--line-2');
-    const txt = (x, y, str, o = {}) => { const n = el('text', { x, y, fill: o.fill || cMuted, 'font-size': o.size || 12, 'font-family': 'Inter, sans-serif', 'font-weight': o.weight || 400, 'text-anchor': o.anchor || 'start' }, svg); n.textContent = str; return n; };
-
-    const defs = el('defs', {}, svg);
-    const clip = (id, y) => { const c = el('clipPath', { id }, defs); el('rect', { x: 0, y, width: W, height: barH, rx: 7 }, c); };
-    clip('cClip', y1); clip('fClip', y2);
-
-    const now = Math.min(Math.max(s.age, s.mem), s.life);
-
-    // bridge: lived part on calendar -> lived part on felt
-    if (now > s.mem) {
-      el('path', { d: `M0,${y1 + barH} L${Xc(now)},${y1 + barH} L${Xf(now)},${y2} L0,${y2} Z`, fill: cSoft }, svg);
+  function geometry() {
+    const s = S, R = Math.ceil(s.life), lnT = Math.log(s.life / s.mem);
+    rows = [];
+    let yC = 0, yF = 0;
+    for (let a = 0; a < R; a++) {
+      const a1 = Math.min(a + 1, s.life);
+      const hC = (a1 - a) / s.life * H;
+      const hF = a1 <= s.mem ? 0 : Math.log(a1 / Math.max(a, s.mem)) / lnT * H;
+      rows.push({ a, a1, y: yC + (yF - yC) * t, h: hC + (hF - hC) * t, hC, hF });
+      yC += hC; yF += hF;
     }
-    // decade connectors
-    const marks = [];
-    for (let a = Math.ceil(s.mem / 10) * 10; a < s.life; a += 10) if (a > s.mem) marks.push(a);
-    marks.forEach(a => el('line', { x1: Xc(a), y1: y1 + barH, x2: Xf(a), y2: y2, stroke: cLine, 'stroke-width': 1 }, svg));
+  }
 
-    // bars
-    const bounds = [s.mem]; for (let y = Math.floor(s.mem) + 1; y < s.life; y++) bounds.push(y); bounds.push(s.life);
-    const drawBar = (X, y, clipId, label) => {
-      const g = el('g', { 'clip-path': `url(#${clipId})` }, svg);
-      for (let i = 0; i < bounds.length - 1; i++) {
-        const a0 = bounds[i], a1 = bounds[i + 1], x0 = X(a0), x1 = X(a1);
-        el('rect', { x: x0, y, width: x1 - x0, height: barH, fill: cEmpty }, g);
-        if (now > a0) el('rect', { x: x0, y, width: X(Math.min(now, a1)) - x0, height: barH, fill: cAcc }, g);
-        if (i > 0 && x1 - x0 > 3) el('rect', { x: x0 - 1, y, width: 2, height: barH, fill: cSurf }, g);
-        const hit = el('rect', { x: x0, y, width: Math.max(3, x1 - x0), height: barH, fill: 'transparent' }, g);
-        hit.addEventListener('mousemove', e => showTip(e.clientX, svg.getBoundingClientRect().top + y * (svg.getBoundingClientRect().height / H),
-          `<b>Age ${Math.floor(a0)}</b> · ${label === 'cal' ? 'on the calendar' : 'feels like'} ${(100 * (X(a1) - x0) / W).toFixed(1)}% of your remembered life`));
-        hit.addEventListener('mouseleave', hideTip);
+  function draw() {
+    if (!S || !W) return;
+    const s = S;
+    geometry();
+    ctx.clearRect(0, 0, W, H);
+    const colW = (W - GUT) / 52, gapX = Math.max(1, colW * 0.22);
+    const lived = Math.floor(sweep * s.livedWeeks);
+    const P = { lived: new Path2D(), ahead: new Path2D(), pre: new Path2D(), now: new Path2D() };
+    const rr = (p, x, y, w, h, r) => p.roundRect ? p.roundRect(x, y, w, h, r) : p.rect(x, y, w, h);
+
+    for (const r of rows) {
+      const gapY = Math.min(2, r.h * 0.28), ch = r.h - gapY;
+      if (ch < 0.35) continue;
+      const gapC = Math.min(2, r.hC * 0.28);
+      const dot = Math.max(1, Math.min(colW - gapX, r.hC - gapC));
+      const cw = dot + (colW - gapX - dot) * t;
+      const rad = Math.min(cw, ch) / 2;
+      const base = Math.round(r.a * WPY);
+      for (let w = 0; w < 52; w++) {
+        const idx = base + w;
+        if (idx >= s.totalWeeks) break;
+        const x = GUT + w * colW + (colW - cw) / 2, y = r.y + gapY / 2;
+        const p = idx < s.memWeeks ? P.pre
+          : idx < lived ? P.lived
+          : (idx === s.livedWeeks && sweep >= 1) ? P.now
+          : P.ahead;
+        rr(p, x, y, cw, ch, rad);
       }
-    };
-    drawBar(Xc, y1, 'cClip', 'cal');
-    drawBar(Xf, y2, 'fClip', 'felt');
+    }
+    ctx.fillStyle = css('--ahead'); ctx.fill(P.ahead);
+    ctx.fillStyle = css('--pre'); ctx.fill(P.pre);
+    ctx.fillStyle = css('--blue'); ctx.fill(P.lived);
+    ctx.fillStyle = css('--ink'); ctx.fill(P.now);
 
-    // labels
-    txt(0, y1 - 9, 'On the calendar', { fill: cInk, weight: 500, size: 13 });
-    txt(W, y1 - 9, pct(s.cal(s.age)), { anchor: 'end', size: 13, weight: 600, fill: cInk });
-    txt(0, y2 + barH + 20, 'How it feels', { fill: cInk, weight: 500, size: 13 });
-    txt(W, y2 + barH + 20, pct(s.felt(s.age)), { anchor: 'end', size: 13, weight: 600, fill: cAcc });
-
-    // age labels in the gap
-    const mid = y1 + barH + gap / 2 + 4;
-    let lastX = -99;
-    marks.forEach(a => {
-      const x = (Xc(a) + Xf(a)) / 2;
-      if (x - lastX < 30 || x > W - 16) return;
-      lastX = x;
-      const bg = el('rect', { x: x - 13, y: mid - 12, width: 26, height: 17, rx: 8, fill: cSurf }, svg);
-      txt(x, mid, a, { anchor: 'middle', size: 11 });
+    // Age labels in the gutter
+    const felt = t >= .5, placed = [];
+    const cur = s.age < s.life && s.age >= 0 ? rows[Math.min(Math.floor(s.age), rows.length - 1)] : null;
+    const cands = [];
+    if (cur && sweep >= 1 && cur.h > 0.3) cands.push({ r: cur, text: 'You', strong: true });
+    rows.forEach(r => {
+      if (r.h < 0.3) return;
+      const decade = r.a % 10 === 0;
+      const first = r.a === Math.floor(s.mem) && felt;
+      const roomy = felt && r.h >= 16;
+      if (decade || first || roomy) cands.push({ r, text: String(r.a) });
     });
-
-    // you marker
-    if (s.age > s.mem && s.age < s.life) {
-      [[Xc(s.age), y1], [Xf(s.age), y2]].forEach(([x, y]) => el('line', { x1: x, x2: x, y1: y - 4, y2: y + barH + 4, stroke: cInk, 'stroke-width': 2, 'stroke-linecap': 'round' }, svg));
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (const c of cands) {
+      const y = c.r.y + c.r.h / 2;
+      if (y < 6 || y > H - 4) continue;
+      if (placed.some(py => Math.abs(py - y) < 14)) continue;
+      placed.push(y);
+      ctx.font = `${c.strong ? 700 : 500} 12px Anybody, sans-serif`;
+      ctx.fillStyle = c.strong ? css('--ink') : css('--muted');
+      ctx.fillText(c.text, GUT - 10, y);
     }
+    readout();
   }
 
-  function drawAll() { if (!state) return; drawGrid(); drawCompare(); }
-  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawAll, 120); });
+  // ---------- Tweens ----------
+  let tRaf = 0;
+  function morphTo(target) {
+    cancelAnimationFrame(tRaf);
+    if (sweep < 1) { cancelAnimationFrame(sRaf); sweep = 1; }
+    if (reduced) { t = target; draw(); return; }
+    const from = t, t0 = performance.now(), dur = 900;
+    const step = now => {
+      const p = clamp01((now - t0) / dur);
+      t = from + (target - from) * ease(p);
+      draw();
+      if (p < 1) tRaf = requestAnimationFrame(step);
+    };
+    tRaf = requestAnimationFrame(step);
+  }
+
+  let sRaf = 0;
+  function playSweep() {
+    if (reduced) { sweep = 1; draw(); return; }
+    const t0 = performance.now(), dur = 2200;
+    const step = now => {
+      const p = clamp01((now - t0) / dur);
+      sweep = ease(p);
+      draw();
+      if (p < 1) sRaf = requestAnimationFrame(step);
+    };
+    sRaf = requestAnimationFrame(step);
+    setTimeout(() => { if (sweep < 1) { cancelAnimationFrame(sRaf); sweep = 1; draw(); } }, dur + 400);
+  }
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting && S && !played) { played = true; playSweep(); }
+    }), { threshold: 0.35 }).observe($('reveal'));
+  } else { played = true; }
+
+  // ---------- Switch ----------
+  const sw = $('switch');
+  sw.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    const mode = b.dataset.mode;
+    sw.dataset.mode = mode;
+    sw.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    morphTo(mode === 'felt' ? 1 : 0);
+  }));
 
   // ---------- Tooltip ----------
-  function showTip(x, y, html) {
+  const tip = $('tip');
+  function hover(e) {
+    if (!S) return;
+    const b = cv.getBoundingClientRect();
+    const x = e.clientX - b.left, y = e.clientY - b.top;
+    const colW = (W - GUT) / 52, w = Math.floor((x - GUT) / colW);
+    const r = rows.find(r => y >= r.y && y < r.y + r.h && r.h > 0.3);
+    if (!r || w < 0 || w > 51) return hideTip();
+    const idx = Math.round(r.a * WPY) + w;
+    if (idx >= S.totalWeeks) return hideTip();
+    let html;
+    if (t >= .5) {
+      const pct = (r.hF / H * 100);
+      html = `<b>Age ${r.a}</b><br>Feels like ${pct < 1 ? pct.toFixed(1) : Math.round(pct)}% of the life you remember`;
+    } else {
+      const st = idx < S.memWeeks ? 'Before your first memory' : idx < S.livedWeeks ? 'Lived' : idx === S.livedWeeks ? 'This week' : 'Still ahead';
+      html = `<b>Age ${r.a}, week ${w + 1}</b><br>${st}`;
+    }
     tip.innerHTML = html;
-    const w = tip.offsetWidth / 2 + 8;
-    tip.style.left = Math.min(innerWidth - w, Math.max(w, x)) + 'px';
-    tip.style.top = Math.max(tip.offsetHeight + 14, y) + 'px';
+    const half = tip.offsetWidth / 2 + 8;
+    tip.style.left = Math.min(innerWidth - half, Math.max(half, e.clientX)) + 'px';
+    tip.style.top = Math.max(tip.offsetHeight + 16, b.top + r.y) + 'px';
     tip.classList.add('on');
   }
   function hideTip() { tip.classList.remove('on'); }
+  cv.addEventListener('pointermove', hover);
+  cv.addEventListener('pointerdown', hover);
+  cv.addEventListener('pointerleave', hideTip);
   addEventListener('scroll', hideTip, { passive: true });
 
-  // ---------- Today checklist ----------
-  const dayKey = 'felt-life-today-' + new Date().toISOString().slice(0, 10);
+  addEventListener('resize', () => { if (!S) return; size(); draw(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
+  if (document.fonts) document.fonts.ready.then(() => draw());
+
+  // ---------- Today ----------
+  const dayKey = 'felt-life-' + new Date().toISOString().slice(0, 10);
   let done = {};
   try { done = JSON.parse(localStorage.getItem(dayKey) || '{}'); } catch (e) {}
-  const todos = [...document.querySelectorAll('.todo')];
-  function renderTodos() {
-    let n = 0;
-    todos.forEach(b => { const on = !!done[b.dataset.k]; b.setAttribute('aria-pressed', on); if (on) n++; });
-    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i < n));
-    $('progText').textContent = n === 4 ? 'All four. A day worth remembering.' : `${n} of 4 today`;
+  const checks = [...document.querySelectorAll('.check')];
+  function renderChecks() {
+    const n = checks.filter(c => done[c.dataset.k]).length;
+    checks.forEach(c => c.setAttribute('aria-pressed', !!done[c.dataset.k]));
+    $('tally').textContent = n === 4 ? "All four. That's a day you'll remember." : `${n} of 4 done today`;
   }
-  todos.forEach(b => b.addEventListener('click', () => {
-    done[b.dataset.k] = !done[b.dataset.k];
+  checks.forEach(c => c.addEventListener('click', () => {
+    done[c.dataset.k] = !done[c.dataset.k];
     try { localStorage.setItem(dayKey, JSON.stringify(done)); } catch (e) {}
-    renderTodos();
+    renderChecks();
   }));
-  renderTodos();
+  renderChecks();
 
   // ---------- Share ----------
-  $('shareBtn').addEventListener('click', async () => {
-    const b = $('shareBtn');
+  $('share').addEventListener('click', async () => {
+    const b = $('share');
     try { await navigator.clipboard.writeText(location.href); b.textContent = 'Link copied'; }
-    catch (e) { b.textContent = 'Copy the address bar to share'; }
-    setTimeout(() => b.textContent = 'Copy link to my results', 2200);
+    catch (e) { b.textContent = 'Copy the address from your browser'; }
+    setTimeout(() => b.textContent = 'Copy link to my results', 2400);
   });
 
-  // ---------- Init ----------
+  // ---------- Method sheet ----------
+  const dlg = $('method');
+  document.querySelectorAll('[data-open-method]').forEach(b => b.addEventListener('click', () => dlg.showModal()));
+  $('closeMethod').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+  // ---------- Start from a shared link ----------
   const h = new URLSearchParams(location.hash.slice(1));
-  ['age', 'life', 'mem'].forEach(k => { if (h.has(k)) $(k).value = h.get(k); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
-  update();
+  if (h.has('age') && h.has('life') && h.has('mem')) {
+    $('age').value = h.get('age'); $('life').value = h.get('life'); $('mem').value = h.get('mem');
+    inputs.forEach(fit);
+    apply(true);
+  }
 })();
 </script>
 </body>
