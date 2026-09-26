@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Felt Life</title>
+<meta name="description" content="See your life in weeks, and how much of it you have felt, using a logarithmic model of time perception.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23B8532A'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --surface: #FFFDF9;
+    --ink: #1C1A17;
+    --ink-2: #4A463F;
+    --muted: #767066;
+    --line: #E3DDD2;
+    --line-2: #D2CBBE;
+    --accent: #B8532A;
+    --accent-soft: #F1DDD2;
+    --ref: #A39D93;
+    --faded: #C9C2B6;
+    --empty: #E6E0D5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141311;
+      --surface: #1B1A17;
+      --ink: #EDE8DF;
+      --ink-2: #C4BDB1;
+      --muted: #938C80;
+      --line: #2B2925;
+      --line-2: #3A3732;
+      --accent: #D9703F;
+      --accent-soft: #3A2419;
+      --ref: #6E685F;
+      --faded: #4E4A43;
+      --empty: #2A2824;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141311;
+    --surface: #1B1A17;
+    --ink: #EDE8DF;
+    --ink-2: #C4BDB1;
+    --muted: #938C80;
+    --line: #2B2925;
+    --line-2: #3A3732;
+    --accent: #D9703F;
+    --accent-soft: #3A2419;
+    --ref: #6E685F;
+    --faded: #4E4A43;
+    --empty: #2A2824;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 17px/1.65 Inter, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  .wide { max-width: 980px; }
+
+  h1, h2, h3, .serif { font-family: Fraunces, Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+  h1 { font-size: clamp(40px, 8vw, 68px); line-height: 1.02; margin: 0 0 20px; font-weight: 300; }
+  h2 { font-size: clamp(28px, 5vw, 38px); line-height: 1.15; margin: 0 0 16px; }
+  h3 { font-size: 22px; margin: 0 0 8px; }
+  p { margin: 0 0 16px; color: var(--ink-2); }
+  em { font-style: italic; }
+  a { color: inherit; text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: var(--accent); }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 14px;
+  }
+  .accent { color: var(--accent); }
+
+  header.top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0; font-size: 14px; color: var(--muted);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 500; }
+  .brand i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .theme-btn {
+    background: none; border: 1px solid var(--line-2); color: var(--ink-2); border-radius: 999px;
+    padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .theme-btn:hover { border-color: var(--ink-2); }
+
+  section { padding: 72px 0; }
+  .hero { padding: 64px 0 40px; }
+  .lede { font-size: 20px; line-height: 1.55; max-width: 600px; }
+
+  /* Form */
+  form.inputs {
+    margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px;
+  }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-2); margin-bottom: 8px; }
+  .field .hint { display: block; font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  .input-row { position: relative; }
+  .field input {
+    width: 100%; font: 400 28px/1.2 Fraunces, Georgia, serif; color: var(--ink);
+    background: transparent; border: 0; border-bottom: 1.5px solid var(--line-2); padding: 6px 48px 8px 0;
+    border-radius: 0; -moz-appearance: textfield; appearance: textfield;
+  }
+  .field input::-webkit-outer-spin-button, .field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field input:focus { outline: none; border-bottom-color: var(--accent); }
+  .field .unit { position: absolute; right: 0; bottom: 12px; font-size: 13px; color: var(--muted); }
+  .form-foot { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .error { color: var(--accent); font-size: 14px; min-height: 1.4em; margin: 0; }
+  .btn {
+    background: var(--ink); color: var(--bg); border: 0; border-radius: 999px; padding: 12px 22px;
+    font: 500 15px Inter, sans-serif; cursor: pointer; transition: transform .15s ease, opacity .15s;
+  }
+  .btn:hover { opacity: .88; }
+  .btn:active { transform: scale(.98); }
+  .btn.ghost { background: transparent; color: var(--ink-2); border: 1px solid var(--line-2); }
+
+  /* Results */
+  #results[hidden] { display: none; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin: 28px 0 36px; }
+  .stat { background: var(--surface); padding: 20px; }
+  .stat .v { font: 400 34px/1.1 Fraunces, Georgia, serif; font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .grid-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .grid-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .sw.faded { background: var(--faded); }
+  .sw.lived { background: var(--ink); }
+  .sw.now { background: var(--accent); }
+  .sw.empty { background: transparent; box-shadow: inset 0 0 0 1.5px var(--line-2); }
+  .canvas-wrap { position: relative; }
+  #weeks { display: block; width: 100%; touch-action: pan-y; }
+  .axis-note { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+  .tip {
+    position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--bg);
+    font-size: 13px; line-height: 1.4; padding: 8px 10px; border-radius: 8px; opacity: 0;
+    transform: translate(-50%, calc(-100% - 12px)); transition: opacity .12s; white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .tip.on { opacity: 1; }
+  .tip b { font-weight: 600; }
+
+  /* Subjective */
+  .hero-num { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; margin: 12px 0 8px; }
+  .hero-num .big { font: 300 clamp(80px, 18vw, 148px)/0.9 Fraunces, Georgia, serif; color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+  .hero-num .vs { font-size: 15px; color: var(--muted); max-width: 240px; line-height: 1.45; }
+  .hero-num .vs b { color: var(--ink); font-weight: 600; }
+
+  .strip-card { margin: 36px 0; }
+  .strip-title { font-size: 14px; color: var(--ink-2); margin-bottom: 10px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  #strip, #curve { display: block; width: 100%; overflow: visible; }
+  #strip rect, #curve .hit { cursor: default; }
+
+  .insights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 32px 0; }
+  .insight { border-top: 1.5px solid var(--ink); padding-top: 14px; }
+  .insight .v { font: 400 30px/1.1 Fraunces, Georgia, serif; font-variant-numeric: tabular-nums; }
+  .insight p { font-size: 14px; margin: 8px 0 0; line-height: 1.5; }
+
+  .formula {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin: 28px 0;
+    font-size: 15px;
+  }
+  .formula .eq { font: 400 20px/1.5 Fraunces, Georgia, serif; color: var(--ink); margin: 6px 0 12px; overflow-x: auto; white-space: nowrap; }
+  .formula .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 4px; }
+  .formula .frac span:first-child { border-bottom: 1px solid var(--ink-2); padding: 0 4px; }
+  .formula p { font-size: 14px; margin: 0 0 8px; }
+  .formula p:last-child { margin: 0; }
+
+  details { margin-top: 12px; }
+  summary { cursor: pointer; font-size: 14px; color: var(--ink-2); }
+  details table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  details th, details td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  details th:first-child, details td:first-child { text-align: left; }
+  details th { color: var(--muted); font-weight: 500; }
+  .table-scroll { max-height: 280px; overflow: auto; }
+
+  /* Message */
+  .turn { border-top: 1px solid var(--line); }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 36px 0; }
+  .pillar { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .pillar .n { font: 400 14px Fraunces, Georgia, serif; color: var(--accent); margin-bottom: 10px; }
+  .pillar p { font-size: 15px; }
+  .pillar .try { font-size: 14px; color: var(--ink); margin: 0; padding-top: 12px; border-top: 1px dashed var(--line-2); }
+  .pillar .cite { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+
+  .closing { text-align: center; padding: 88px 0 72px; }
+  .closing .line { font: 300 clamp(30px, 5.6vw, 48px)/1.2 Fraunces, Georgia, serif; margin: 0 auto 20px; max-width: 660px; color: var(--ink); }
+  .closing p { max-width: 540px; margin: 0 auto 16px; }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 56px; font-size: 13px; color: var(--muted); }
+  footer h3 { font-size: 16px; color: var(--ink); }
+  footer p, footer li { color: var(--muted); font-size: 13px; line-height: 1.55; }
+  footer ol { padding-left: 18px; margin: 0 0 20px; }
+  footer li { margin-bottom: 6px; }
+
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  @media (max-width: 720px) {
+    body { font-size: 16px; }
+    section { padding: 56px 0; }
+    form.inputs { grid-template-columns: 1fr; padding: 20px; }
+    .stats { grid-template-columns: 1fr; }
+    .stat { padding: 16px 18px; }
+    .insights { grid-template-columns: 1fr; }
+    .pillars { grid-template-columns: 1fr; }
+    .grid-card { padding: 14px; }
+  }
+  @media print {
+    header.top .theme-btn, form.inputs .form-foot, .reveal { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap wide">
+  <header class="top">
+    <span class="brand"><i></i>The Felt Life</span>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle color theme">Theme</button>
+  </header>
+</div>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">A life in weeks, and how long it feels</p>
+      <h1>Your years are the same length.<br><em>They don't feel it.</em></h1>
+      <p class="lede">A year at five is a fifth of everything you've known. At fifty it's a fiftieth. Enter three numbers to see your life in weeks, and how much of it you have <em>felt</em> so far.</p>
+
+      <form class="inputs" id="form" novalidate>
+        <div class="field">
+          <label for="age">Your age</label>
+          <div class="input-row"><input id="age" type="number" inputmode="decimal" step="0.1" min="0" max="130" value="30"><span class="unit">years</span></div>
+          <span class="hint">Decimals are fine, e.g. 34.5</span>
+        </div>
+        <div class="field">
+          <label for="life">Expected lifespan</label>
+          <div class="input-row"><input id="life" type="number" inputmode="decimal" step="1" min="2" max="130" value="80"><span class="unit">years</span></div>
+          <span class="hint">Life expectancy in rich countries is about 80</span>
+        </div>
+        <div class="field">
+          <label for="mem">Earliest memory</label>
+          <div class="input-row"><input id="mem" type="number" inputmode="decimal" step="0.5" min="1" max="20" value="3"><span class="unit">years old</span></div>
+          <span class="hint">Most people's first memories are from about age 3</span>
+        </div>
+        <div class="form-foot">
+          <p class="error" id="error" role="alert"></p>
+          <button class="btn" type="submit">Show my life</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div id="results" hidden>
+    <!-- Weeks -->
+    <section id="weeksSection">
+      <div class="wrap">
+        <p class="eyebrow">01 · Clock time</p>
+        <h2>Your life in weeks</h2>
+        <p>Each dot is one week. Each row is one year. <span id="weeksLede"></span></p>
+      </div>
+      <div class="wrap">
+        <div class="stats">
+          <div class="stat"><div class="v" id="sLived">–</div><div class="l">weeks lived</div></div>
+          <div class="stat"><div class="v" id="sLeft">–</div><div class="l">weeks remaining</div></div>
+          <div class="stat"><div class="v" id="sClock">–</div><div class="l">of your expected lifespan, by the calendar</div></div>
+        </div>
+      </div>
+      <div class="wrap">
+        <div class="grid-card reveal">
+          <div class="grid-head">
+            <div class="legend" aria-label="Legend">
+              <span><i class="sw faded"></i>Before your earliest memory</span>
+              <span><i class="sw lived"></i>Lived and remembered</span>
+              <span><i class="sw now"></i>This week</span>
+              <span><i class="sw empty"></i>Still ahead</span>
+            </div>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="weeks" role="img" aria-label="Grid of weeks in your life"></canvas>
+          </div>
+          <div class="axis-note"><span>Week 1 →</span><span>← Week 52</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subjective -->
+    <section id="feltSection">
+      <div class="wrap">
+        <p class="eyebrow">02 · Felt time</p>
+        <h2>How much of your life you have felt</h2>
+        <div class="hero-num">
+          <div class="big" id="bigPct">–</div>
+          <div class="vs" id="bigVs"></div>
+        </div>
+        <p id="feltExplain"></p>
+      </div>
+
+      <div class="wrap wide">
+        <div class="grid-card strip-card reveal">
+          <div class="strip-title"><span>Your remembered life, with each year drawn at the size it <em>feels</em></span><span class="legend"><span><i class="sw now"></i>Felt so far</span><span><i class="sw empty"></i>Still ahead</span></span></div>
+          <svg id="strip" role="img" aria-label="Years scaled by perceived length"></svg>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="insights reveal">
+          <div class="insight"><div class="v" id="iYear">–</div><p id="iYearT"></p></div>
+          <div class="insight"><div class="v" id="iMid">–</div><p id="iMidT"></p></div>
+          <div class="insight"><div class="v" id="iLeft">–</div><p id="iLeftT"></p></div>
+        </div>
+      </div>
+
+      <div class="wrap wide">
+        <div class="grid-card reveal">
+          <div class="strip-title"><span>Share of your remembered life: calendar vs. felt</span></div>
+          <svg id="curve" role="img" aria-label="Line chart comparing calendar and felt share of remembered life by age"></svg>
+          <details>
+            <summary>Show as a table</summary>
+            <div class="table-scroll"><table id="tbl"><thead><tr><th>Age</th><th>Calendar</th><th>Felt</th></tr></thead><tbody></tbody></table></div>
+          </details>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <div class="formula reveal">
+          <p class="eyebrow" style="margin-bottom:4px">The model</p>
+          <div class="eq">felt share =
+            <span class="frac"><span>ln(age ÷ m)</span><span>ln(lifespan ÷ m)</span></span>
+            <span style="color:var(--muted);font-size:16px">&nbsp;&nbsp;m = age of earliest memory</span>
+          </div>
+          <p>In 1877 the philosopher Paul Janet suggested that a year feels as long as the share of your life it makes up. If each moment feels shorter in proportion to how long you've been alive, then adding up those moments gives a logarithm. Your felt time is counted from your first memory, because that is where your remembered life begins.</p>
+          <p>This is a model, not a measurement. Studies find that people of all ages feel days and weeks passing at about the same speed. Older adults do say that <em>decades</em> seem to go faster, and that is the effect this model describes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Message -->
+    <section class="turn" id="turn">
+      <div class="wrap">
+        <p class="eyebrow">03 · The good news</p>
+        <h2>The curve assumes every year is like the last. <em>It doesn't have to be.</em></h2>
+        <p>Looking back, we judge how long a stretch of time was by how much we remember from it. A year of routine leaves few new memories and folds up small. A year full of firsts, people and attention unfolds long. Research on memory, attention and wellbeing points to four things that make your time feel longer when you look back on it.</p>
+
+        <div class="pillars">
+          <article class="pillar reveal">
+            <div class="n">i.</div>
+            <h3>Novelty</h3>
+            <p>New experiences create new memories, and memories are what past time is measured by. This is the "holiday paradox": a new trip flies by while you're on it, then feels long when you remember it. Most people's best-remembered years are from their teens and twenties, when so much happened for the first time.</p>
+            <p class="try">Try: change a route, learn something with a steep beginning, go somewhere you can't navigate on autopilot.</p>
+            <p class="cite">Hammond, <em>Time Warped</em> (2012) · Avni-Babad &amp; Ritov (2003) · Rubin, Rahhal &amp; Poon (1998)</p>
+          </article>
+          <article class="pillar reveal">
+            <div class="n">ii.</div>
+            <h3>Fulfillment</h3>
+            <p>Meaningful work and absorbing challenges put you in <em>flow</em>. Hours pass without you noticing, but they leave behind things you made and moments you remember. Moments of awe also help: in experiments, people who felt awe said they had more time available and felt less rushed.</p>
+            <p class="try">Try: protect one block a week for the thing that absorbs you; look for awe on purpose, in nature, music or scale.</p>
+            <p class="cite">Csikszentmihalyi, <em>Flow</em> (1990) · Rudd, Vohs &amp; Aaker, <em>Psychological Science</em> (2012)</p>
+          </article>
+          <article class="pillar reveal">
+            <div class="n">iii.</div>
+            <h3>Relationships</h3>
+            <p>The Harvard Study of Adult Development has followed its participants for more than 85 years. Its clearest finding is that the quality of people's relationships predicts health and happiness in later life better than any other factor it measured. Emotional moments are also remembered more strongly, and the moments that move us most usually involve other people.</p>
+            <p class="try">Try: fewer "catch-ups", more shared firsts. Do something new <em>with</em> someone.</p>
+            <p class="cite">Waldinger &amp; Schulz, <em>The Good Life</em> (2023) · McGaugh, <em>Annual Review of Neuroscience</em> (2004)</p>
+          </article>
+          <article class="pillar reveal">
+            <div class="n">iv.</div>
+            <h3>Presence</h3>
+            <p>In one large study, people's minds were wandering during nearly half of their waking hours, and they were less happy when that happened. You can't remember what you didn't notice. Paying attention is how a moment becomes a memory, and people who have just meditated tend to judge time intervals as longer.</p>
+            <p class="try">Try: once a day, fully notice one ordinary thing: its light, sound and texture. That's a memory you've kept.</p>
+            <p class="cite">Killingsworth &amp; Gilbert, <em>Science</em> (2010) · Kramer, Weger &amp; Sharma, <em>Consciousness and Cognition</em> (2013)</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="closing wrap">
+        <p class="eyebrow">For you</p>
+        <p class="line" id="closeLine">The number of weeks you have left is fixed. <em class="accent">How full they are is not.</em></p>
+        <p id="closeText"></p>
+        <p style="margin-top:28px"><button class="btn ghost" id="shareBtn" type="button">Copy a link to these results</button></p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3>Method &amp; sources</h3>
+    <p>Weeks are counted as 52.18 per year. The felt share is ln(age/m) ÷ ln(lifespan/m), which follows from assuming that the felt length of each moment is proportional to 1/age (Janet, 1877). The "calendar" line in the chart counts time from your earliest memory, so the two lines can be compared directly. Nothing you enter leaves your browser.</p>
+    <ol>
+      <li>Janet, P. (1877). Une illusion d'optique interne. <em>Revue Philosophique</em>, 3, 497–502.</li>
+      <li>Wittmann, M. &amp; Lehnhoff, S. (2005). Age effects in perception of time. <em>Psychological Reports</em>, 97, 921–935.</li>
+      <li>Friedman, W. J. &amp; Janssen, S. M. J. (2010). Aging and the speed of time. <em>Acta Psychologica</em>, 134, 130–141.</li>
+      <li>Avni-Babad, D. &amp; Ritov, I. (2003). Routine and the perception of time. <em>Journal of Experimental Psychology: General</em>, 132, 543–550.</li>
+      <li>Hammond, C. (2012). <em>Time Warped: Unlocking the Mysteries of Time Perception.</em> Canongate.</li>
+      <li>Rubin, D. C., Rahhal, T. A. &amp; Poon, L. W. (1998). Things learned in early adulthood are remembered best. <em>Memory &amp; Cognition</em>, 26, 3–19.</li>
+      <li>Csikszentmihalyi, M. (1990). <em>Flow: The Psychology of Optimal Experience.</em> Harper &amp; Row.</li>
+      <li>Rudd, M., Vohs, K. D. &amp; Aaker, J. (2012). Awe expands people's perception of time. <em>Psychological Science</em>, 23, 1130–1136.</li>
+      <li>Waldinger, R. &amp; Schulz, M. (2023). <em>The Good Life.</em> Simon &amp; Schuster.</li>
+      <li>McGaugh, J. L. (2004). The amygdala modulates the consolidation of memories of emotionally arousing experiences. <em>Annual Review of Neuroscience</em>, 27, 1–28.</li>
+      <li>Killingsworth, M. A. &amp; Gilbert, D. T. (2010). A wandering mind is an unhappy mind. <em>Science</em>, 330, 932.</li>
+      <li>Kramer, R. S. S., Weger, U. W. &amp; Sharma, D. (2013). The effect of mindfulness meditation on time perception. <em>Consciousness and Cognition</em>, 22, 846–852.</li>
+      <li>Akhtar, S. et al. (2018). Fictional first memories. <em>Psychological Science</em>, 29, 1612–1619.</li>
+    </ol>
+    <p>Inspired by Tim Urban's "Your Life in Weeks" and <a href="https://weeksoflife.com/" rel="noopener">weeksoflife.com</a>.</p>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+(() => {
+  const WPY = 52.1775;
+  const $ = id => document.getElementById(id);
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  const pct = (n, d = 0) => (n * 100).toFixed(d) + '%';
+  const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  const tip = $('tip');
+  let state = null;
+
+  // ---------- Theme ----------
+  const themeKey = 'felt-life-theme';
+  try { const t = localStorage.getItem(themeKey); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  $('themeBtn').addEventListener('click', () => {
+    const dark = document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === 'dark'
+      : matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem(themeKey, next); } catch (e) {}
+    if (state) drawAll();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => state && drawAll());
+
+  // ---------- Model ----------
+  function model(age, life, mem) {
+    const clamp = x => Math.min(1, Math.max(0, x));
+    const felt = a => a <= mem ? 0 : clamp(Math.log(a / mem) / Math.log(life / mem));
+    const cal = a => clamp((a - mem) / (life - mem));
+    return {
+      age, life, mem, felt, cal,
+      totalWeeks: Math.round(life * WPY),
+      livedWeeks: Math.min(Math.floor(age * WPY), Math.round(life * WPY)),
+      memWeeks: Math.floor(mem * WPY),
+      feltNow: felt(age),
+      clockNow: clamp(age / life),
+      midpoint: Math.sqrt(mem * life),
+    };
+  }
+
+  // ---------- Form ----------
+  function readInputs() {
+    const age = parseFloat($('age').value), life = parseFloat($('life').value), mem = parseFloat($('mem').value);
+    if ([age, life, mem].some(v => !isFinite(v))) return { err: 'Please fill in all three numbers.' };
+    if (age < 0 || age > 130) return { err: 'Age should be between 0 and 130.' };
+    if (life < 2 || life > 130) return { err: 'Lifespan should be between 2 and 130.' };
+    if (mem < 1 || mem > 20) return { err: 'Earliest memory should be between 1 and 20.' };
+    if (mem >= life) return { err: 'Your earliest memory needs to come before the end of your expected lifespan.' };
+    return { age, life, mem };
+  }
+
+  $('form').addEventListener('submit', e => {
+    e.preventDefault();
+    const r = readInputs();
+    if (r.err) { $('error').textContent = r.err; return; }
+    $('error').textContent = '';
+    run(r, true);
+  });
+
+  function run({ age, life, mem }, scroll) {
+    state = model(age, life, mem);
+    $('results').hidden = false;
+    try { history.replaceState(null, '', `#age=${age}&life=${life}&mem=${mem}`); } catch (e) {}
+    writeCopy();
+    drawAll();
+    observeReveals();
+    if (scroll) $('weeksSection').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+
+  // ---------- Copy ----------
+  function writeCopy() {
+    const s = state;
+    const left = Math.max(0, s.totalWeeks - s.livedWeeks);
+    const yrs = n => (Math.round(n * 10) / 10).toString().replace(/\.0$/, '');
+    $('sLived').textContent = fmt(s.livedWeeks);
+    $('sLeft').textContent = fmt(left);
+    $('sClock').textContent = pct(s.clockNow);
+    $('weeksLede').textContent = s.age >= s.life
+      ? `You've lived past the ${yrs(s.life)} years you expected, so every week from here is extra.`
+      : `You have lived ${fmt(s.livedWeeks)} of about ${fmt(s.totalWeeks)} weeks. The pale dots at the top are weeks you lived but don't remember.`;
+
+    $('bigPct').textContent = pct(s.feltNow);
+    const remCal = s.cal(s.age);
+    $('bigVs').innerHTML = `of your remembered life has been <b>felt</b>, while only <b>${pct(remCal)}</b> of it has passed by the calendar.`;
+
+    let explain;
+    if (s.age <= s.mem) {
+      explain = `You haven't passed the age of your earliest memory yet, so in this model all of your felt life is still ahead of you.`;
+    } else if (s.age >= s.life) {
+      explain = `By this model you've felt all of the life you expected. But the model only follows the calendar. The richer your days are, the more of them you remember.`;
+    } else {
+      explain = `Each year is measured against everything you've lived before it. Your year at ${yrs(s.mem + 1)} added a huge share to your remembered life. Your year at ${yrs(Math.floor(s.age))} adds only a small share. So by the time ${pct(remCal)} of your remembered life has passed on the calendar, the model says ${pct(s.feltNow)} of it has already been felt.`;
+    }
+    $('feltExplain').textContent = explain;
+
+    const weeksEquiv = 52 * s.mem / Math.max(s.age, s.mem);
+    $('iYear').textContent = `${weeksEquiv < 10 ? weeksEquiv.toFixed(1) : Math.round(weeksEquiv)} wks`;
+    $('iYearT').textContent = s.age > s.mem
+      ? `Under this model, a year at ${yrs(s.age)} feels about as long as ${weeksEquiv.toFixed(1)} weeks did when you were ${yrs(s.mem)}.`
+      : `A year right now feels as long as it ever will.`;
+    $('iMid').textContent = `age ${yrs(s.midpoint)}`;
+    $('iMidT').textContent = s.age >= s.midpoint
+      ? `The halfway point of your felt life, √(${yrs(s.mem)} × ${yrs(s.life)}). You passed it ${yrs(s.age - s.midpoint)} years ago.`
+      : `The halfway point of your felt life, √(${yrs(s.mem)} × ${yrs(s.life)}). It's still ${yrs(s.midpoint - s.age)} years ahead of you.`;
+    const yearsLeft = Math.max(0, s.life - s.age);
+    $('iLeft').textContent = pct(1 - s.feltNow);
+    $('iLeftT').textContent = yearsLeft > 0
+      ? `of your felt life is still ahead, spread over about ${yrs(yearsLeft)} calendar years. This is the part you can make larger.`
+      : `of your felt life is left in the model. Real life doesn't stop when the model does.`;
+
+    // Closing
+    if (left > 0) {
+      const months = Math.floor(left / WPY * 12);
+      $('closeText').textContent = `You have about ${fmt(left)} weeks ahead of you. If one week in every four holds something genuinely new, like a place, a skill, a conversation that changes your mind, or a first with someone you love, that's about ${fmt(months)} new chapters. Years like that don't fold up small.`;
+    } else {
+      $('closeText').textContent = `You've lived past the estimate, and every week from here is extra. Fill it with new things, with people, and with attention.`;
+    }
+  }
+
+  // ---------- Week grid (canvas) ----------
+  const cv = $('weeks');
+  let gridGeom = null;
+  function drawGrid() {
+    const s = state;
+    const rows = Math.ceil(s.life);
+    const W = cv.parentElement.clientWidth;
+    const labelW = W < 500 ? 22 : 30;
+    const cols = 52;
+    const cell = (W - labelW) / cols;
+    const r = Math.max(1.1, cell * 0.34);
+    const H = Math.ceil(rows * cell);
+    const dpr = window.devicePixelRatio || 1;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.height = H + 'px';
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    const cInk = css('--ink'), cFaded = css('--faded'), cEmpty = css('--line-2'), cAcc = css('--accent'), cMuted = css('--muted');
+    ctx.font = `${W < 500 ? 9 : 10}px Inter, sans-serif`;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+
+    for (let y = 0; y < rows; y++) {
+      const cy = y * cell + cell / 2;
+      if (y % 5 === 0 || y === rows - 1) { ctx.fillStyle = cMuted; ctx.fillText(y, labelW - 8, cy); }
+      for (let w = 0; w < cols; w++) {
+        const idx = Math.round(y * WPY) + w; // week index from birth
+        if (idx >= s.totalWeeks) continue;
+        const cx = labelW + w * cell + cell / 2;
+        ctx.beginPath();
+        if (idx === s.livedWeeks && s.livedWeeks < s.totalWeeks) {
+          ctx.arc(cx, cy, r * 1.25, 0, Math.PI * 2); ctx.fillStyle = cAcc; ctx.fill();
+        } else if (idx < s.livedWeeks) {
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fillStyle = idx < s.memWeeks ? cFaded : cInk; ctx.fill();
+        } else {
+          ctx.arc(cx, cy, r - 0.5, 0, Math.PI * 2);
+          ctx.strokeStyle = cEmpty; ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+    }
+    gridGeom = { labelW, cell, rows, cols };
+  }
+
+  function gridHover(e) {
+    if (!gridGeom || !state) return;
+    const rect = cv.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const col = Math.floor((x - gridGeom.labelW) / gridGeom.cell), row = Math.floor(y / gridGeom.cell);
+    if (col < 0 || col >= 52 || row < 0 || row >= gridGeom.rows) return hideTip();
+    const idx = Math.round(row * WPY) + col;
+    if (idx >= state.totalWeeks) return hideTip();
+    let status = idx === state.livedWeeks ? 'This week'
+      : idx < state.memWeeks ? 'Lived, before your first memory'
+      : idx < state.livedWeeks ? 'Lived' : 'Still ahead';
+    showTip(e.clientX, rect.top + row * gridGeom.cell, `<b>Age ${row}, week ${col + 1}</b><br>${status}`);
+  }
+  cv.addEventListener('mousemove', gridHover);
+  cv.addEventListener('mouseleave', hideTip);
+
+  // ---------- Felt strip (SVG) ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+
+  function drawStrip() {
+    const s = state, svg = $('strip');
+    svg.innerHTML = '';
+    const W = svg.parentElement.clientWidth - (window.innerWidth < 720 ? 28 : 48);
+    const barH = 44, top = 4, H = barH + 34;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+    const total = Math.log(s.life / s.mem);
+    const X = a => (Math.log(a / s.mem) / total) * W;
+    const cAcc = css('--accent'), cEmpty = css('--empty'), cMuted = css('--muted'), cBg = css('--surface');
+
+    // year boundaries from mem to life
+    const bounds = [s.mem];
+    for (let y = Math.floor(s.mem) + 1; y < s.life; y++) bounds.push(y);
+    bounds.push(s.life);
+    for (let i = 0; i < bounds.length - 1; i++) {
+      const a0 = bounds[i], a1 = bounds[i + 1];
+      const x0 = X(a0), x1 = X(a1);
+      const g = el('g', {}, svg);
+      // base
+      el('rect', { x: x0, y: top, width: Math.max(0.5, x1 - x0), height: barH, fill: cEmpty }, g);
+      // lived part
+      if (s.age > a0) {
+        const xa = X(Math.min(s.age, a1));
+        el('rect', { x: x0, y: top, width: Math.max(0.5, xa - x0), height: barH, fill: cAcc }, g);
+      }
+      // surface gap between years
+      if (i > 0 && x1 - x0 > 2.5) el('rect', { x: x0 - 1, y: top, width: 2, height: barH, fill: cBg }, g);
+      const hit = el('rect', { x: x0, y: top, width: Math.max(4, x1 - x0), height: barH, fill: 'transparent' }, g);
+      const share = (Math.log(a1 / a0) / total);
+      hit.addEventListener('mousemove', e => showTip(e.clientX, svg.getBoundingClientRect().top + top,
+        `<b>Age ${Math.floor(a0)}</b><br>${pct(share, 1)} of your felt life<br><span style="opacity:.7">${pct((a1 - a0) / (s.life - s.mem), 1)} by the calendar</span>`));
+      hit.addEventListener('mouseleave', hideTip);
+    }
+    // rounded ends by clipping
+    const clip = el('clipPath', { id: 'stripClip' }, el('defs', {}, svg));
+    el('rect', { x: 0, y: top, width: W, height: barH, rx: 6 }, clip);
+    [...svg.querySelectorAll('g')].forEach(g => g.setAttribute('clip-path', 'url(#stripClip)'));
+
+    // ticks
+    const candidates = [s.mem, 5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120].filter(a => a >= s.mem && a <= s.life);
+    if (!candidates.includes(s.life)) candidates.push(s.life);
+    let lastX = -999;
+    candidates.forEach((a, i) => {
+      const x = X(a);
+      if (x - lastX < 28 && i !== candidates.length - 1) return;
+      if (i === candidates.length - 1 && x - lastX < 28) return;
+      lastX = x;
+      el('line', { x1: x, x2: x, y1: top + barH + 2, y2: top + barH + 7, stroke: cMuted, 'stroke-width': 1 }, svg);
+      const t = el('text', { x: Math.min(Math.max(x, 8), W - 8), y: top + barH + 22, 'text-anchor': x < 8 ? 'start' : x > W - 12 ? 'end' : 'middle', fill: cMuted, 'font-size': 11, 'font-family': 'Inter, sans-serif' }, svg);
+      t.textContent = Math.round(a * 10) / 10;
+    });
+  }
+
+  // ---------- Curve chart (SVG) ----------
+  function drawCurve() {
+    const s = state, svg = $('curve');
+    svg.innerHTML = '';
+    const W = svg.parentElement.clientWidth - (window.innerWidth < 720 ? 28 : 48);
+    const H = Math.round(Math.min(340, Math.max(220, W * 0.45)));
+    const m = { l: 40, r: 70, t: 12, b: 30 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+    const X = a => m.l + (a - s.mem) / (s.life - s.mem) * iw;
+    const Y = v => m.t + (1 - v) * ih;
+    const cInk = css('--ink'), cMuted = css('--muted'), cLine = css('--line'), cAcc = css('--accent'), cRef = css('--ref'), cSurf = css('--surface');
+    const font = { 'font-family': 'Inter, sans-serif', 'font-size': 11, fill: cMuted };
+
+    [0, .25, .5, .75, 1].forEach(v => {
+      el('line', { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), stroke: cLine, 'stroke-width': 1 }, svg);
+      const t = el('text', { ...font, x: m.l - 8, y: Y(v) + 4, 'text-anchor': 'end' }, svg); t.textContent = (v * 100) + '%';
+    });
+    const step = (s.life - s.mem) > 60 ? 20 : 10;
+    const xt = [s.mem]; for (let a = Math.ceil((s.mem + 1) / step) * step; a < s.life; a += step) xt.push(a); xt.push(s.life);
+    xt.forEach((a, i) => {
+      if (i > 0 && i < xt.length - 1 && (X(a) - X(xt[i - 1]) < 26 || X(xt[xt.length - 1]) - X(a) < 26)) return;
+      const t = el('text', { ...font, x: X(a), y: H - 8, 'text-anchor': 'middle' }, svg); t.textContent = Math.round(a * 10) / 10;
+    });
+
+    const N = 160, pts = [];
+    for (let i = 0; i <= N; i++) { const a = s.mem + (s.life - s.mem) * i / N; pts.push(a); }
+    const path = f => pts.map((a, i) => `${i ? 'L' : 'M'}${X(a).toFixed(1)},${Y(f(a)).toFixed(1)}`).join('');
+    el('path', { d: path(s.cal), fill: 'none', stroke: cRef, 'stroke-width': 2, 'stroke-dasharray': '5 5', 'stroke-linecap': 'round' }, svg);
+    el('path', { d: path(s.felt), fill: 'none', stroke: cAcc, 'stroke-width': 2, 'stroke-linecap': 'round' }, svg);
+
+    // direct labels
+    const lf = el('text', { x: m.l + iw + 8, y: Y(1) + 4, fill: cInk, 'font-size': 12, 'font-family': 'Inter, sans-serif', 'font-weight': 500 }, svg); lf.textContent = 'Felt';
+    const lc = el('text', { x: m.l + iw + 8, y: Y(1) + 20, fill: cMuted, 'font-size': 12, 'font-family': 'Inter, sans-serif' }, svg); lc.textContent = 'Calendar';
+
+    // you-are-here
+    if (s.age > s.mem && s.age < s.life) {
+      const ax = X(s.age);
+      el('line', { x1: ax, x2: ax, y1: m.t, y2: m.t + ih, stroke: cLine, 'stroke-width': 1 }, svg);
+      el('circle', { cx: ax, cy: Y(s.felt(s.age)), r: 5, fill: cAcc, stroke: cSurf, 'stroke-width': 2 }, svg);
+      el('circle', { cx: ax, cy: Y(s.cal(s.age)), r: 4, fill: cRef, stroke: cSurf, 'stroke-width': 2 }, svg);
+      const t = el('text', { x: ax + (ax > m.l + iw - 60 ? -8 : 8), y: Y(s.felt(s.age)) - 10, 'text-anchor': ax > m.l + iw - 60 ? 'end' : 'start', fill: cInk, 'font-size': 12, 'font-family': 'Inter, sans-serif', 'font-weight': 500 }, svg);
+      t.textContent = `You · ${pct(s.feltNow)}`;
+    }
+
+    // crosshair
+    const cross = el('line', { y1: m.t, y2: m.t + ih, stroke: cMuted, 'stroke-width': 1, 'stroke-dasharray': '2 3', opacity: 0 }, svg);
+    const dotF = el('circle', { r: 4, fill: cAcc, stroke: cSurf, 'stroke-width': 2, opacity: 0 }, svg);
+    const dotC = el('circle', { r: 4, fill: cRef, stroke: cSurf, 'stroke-width': 2, opacity: 0 }, svg);
+    const hit = el('rect', { class: 'hit', x: m.l, y: 0, width: iw, height: H, fill: 'transparent' }, svg);
+    const move = e => {
+      const r = svg.getBoundingClientRect();
+      const px = (e.clientX - r.left) * (W / r.width);
+      const a = Math.min(s.life, Math.max(s.mem, s.mem + (px - m.l) / iw * (s.life - s.mem)));
+      const x = X(a);
+      cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.setAttribute('opacity', 1);
+      dotF.setAttribute('cx', x); dotF.setAttribute('cy', Y(s.felt(a))); dotF.setAttribute('opacity', 1);
+      dotC.setAttribute('cx', x); dotC.setAttribute('cy', Y(s.cal(a))); dotC.setAttribute('opacity', 1);
+      showTip(e.clientX, r.top + m.t, `<b>Age ${a.toFixed(1)}</b><br>Felt: ${pct(s.felt(a))}<br>Calendar: ${pct(s.cal(a))}`);
+    };
+    hit.addEventListener('mousemove', move);
+    hit.addEventListener('mouseleave', () => { [cross, dotF, dotC].forEach(n => n.setAttribute('opacity', 0)); hideTip(); });
+
+    // table
+    const tb = $('tbl').querySelector('tbody'); tb.innerHTML = '';
+    const rows = []; for (let a = Math.ceil(s.mem); a <= s.life; a += (s.life - s.mem > 50 ? 5 : 2)) rows.push(a);
+    if (rows[rows.length - 1] !== s.life) rows.push(s.life);
+    rows.forEach(a => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${a}</td><td>${pct(s.cal(a))}</td><td>${pct(s.felt(a))}</td>`; tb.appendChild(tr); });
+  }
+
+  // ---------- Tooltip ----------
+  function showTip(x, y, html) {
+    tip.innerHTML = html;
+    const w = tip.offsetWidth / 2 + 8;
+    tip.style.left = Math.min(window.innerWidth - w, Math.max(w, x)) + 'px';
+    tip.style.top = Math.max(tip.offsetHeight + 16, y) + 'px';
+    tip.classList.add('on');
+  }
+  function hideTip() { tip.classList.remove('on'); }
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  function drawAll() { drawGrid(); drawStrip(); drawCurve(); }
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => state && drawAll(), 120); });
+
+  // ---------- Reveal ----------
+  let io;
+  function observeReveals() {
+    if (!('IntersectionObserver' in window)) { document.querySelectorAll('.reveal').forEach(n => n.classList.add('in')); return; }
+    io = io || new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold: 0.12 });
+    document.querySelectorAll('.reveal:not(.in)').forEach(n => io.observe(n));
+  }
+
+  // ---------- Share ----------
+  $('shareBtn').addEventListener('click', async () => {
+    const btn = $('shareBtn');
+    try { await navigator.clipboard.writeText(location.href); btn.textContent = 'Link copied'; }
+    catch (e) { btn.textContent = 'Copy the address bar to share'; }
+    setTimeout(() => btn.textContent = 'Copy a link to these results', 2200);
+  });
+
+  // ---------- Init from URL ----------
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.has('age') && h.has('life') && h.has('mem')) {
+    $('age').value = h.get('age'); $('life').value = h.get('life'); $('mem').value = h.get('mem');
+    const r = readInputs();
+    if (!r.err) run(r, false);
+  }
+})();
+</script>
+</body>
+</html>
