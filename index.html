@@ -10,9 +10,11 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='2' y='1' width='12' height='7' rx='2' fill='%232E3BF0'/><rect x='2' y='10' width='12' height='2.5' rx='1.25' fill='%232E3BF0'/><rect x='2' y='14' width='12' height='1' rx='.5' fill='%232E3BF0'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&display=swap" rel="stylesheet">
 <style>
   :root {
+    --sans: Archivo, system-ui, sans-serif;
+    --serif: Newsreader, Georgia, serif;
     --ground: #ECEDF0;
     --raised: #F6F7F9;
     --ink: #1A1C22;
@@ -50,10 +52,9 @@
     margin: 0;
     background: var(--ground);
     color: var(--ink);
-    font-family: Anybody, system-ui, sans-serif;
-    font-size: 18px;
-    line-height: 1.5;
-    font-stretch: 100%;
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
   button { font: inherit; color: inherit; }
@@ -63,9 +64,9 @@
 
   /* Header */
   .bar { display: flex; justify-content: space-between; align-items: center; height: 68px; }
-  .mark { font-weight: 750; font-stretch: 135%; font-size: 17px; text-decoration: none; color: var(--ink); letter-spacing: -0.01em; }
+  .mark { font-family: var(--sans); font-weight: 750; font-stretch: 112%; font-size: 17px; text-decoration: none; color: var(--ink); }
   .textbtn {
-    background: none; border: 0; padding: 8px 0; cursor: pointer; font-size: 16px; color: var(--ink-2);
+    font-family: var(--sans); background: none; border: 0; padding: 8px 0; cursor: pointer; font-size: 15px; color: var(--ink-2);
     text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 5px; text-decoration-thickness: 2px;
   }
   .textbtn:hover { color: var(--ink); text-decoration-color: var(--blue); }
@@ -73,38 +74,38 @@
   /* Intro */
   .intro { min-height: calc(100svh - 68px); display: flex; flex-direction: column; justify-content: center; padding-block: 24px 72px; }
   h1 {
-    margin: 0 0 clamp(36px, 6vh, 64px);
-    font-weight: 780; font-size: clamp(40px, 12vw, 116px); line-height: .94; letter-spacing: -0.025em;
+    font-family: var(--sans); font-weight: 800; font-stretch: 108%;
+    font-size: clamp(42px, 7.2vw, 100px); line-height: .98; letter-spacing: -0.025em;
+    margin: 0 0 clamp(32px, 5vh, 56px); max-width: 11.5em;
   }
-  h1 span { display: block; }
-  .madlib { font-size: clamp(22px, 2.8vw, 34px); line-height: 1.6; font-weight: 400; color: var(--ink-2); }
+  .madlib { font-size: clamp(24px, 2.9vw, 36px); line-height: 1.55; color: var(--ink-2); }
   .madlib p { margin: 0; }
   .nw { white-space: nowrap; }
   .madlib input {
-    font: inherit; font-weight: 750; font-stretch: 100%; color: var(--blue);
-    width: 2.4ch; text-align: center; padding: 0 2px; margin: 0 2px;
+    font-family: var(--sans); font-size: .92em; font-weight: 750; color: var(--blue);
+    width: 2.4ch; text-align: center; padding: 0 2px; margin: 0 3px;
     background: transparent; border: 0; border-bottom: 3px solid var(--blue); border-radius: 0;
     -moz-appearance: textfield; appearance: textfield;
   }
   .madlib input::-webkit-outer-spin-button, .madlib input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .madlib input:focus { outline: none; background: color-mix(in srgb, var(--blue) 12%, transparent); }
   .go {
-    margin-top: clamp(28px, 4vh, 44px); background: var(--blue); color: var(--on-blue); border: 0; cursor: pointer;
-    font-size: 19px; font-weight: 650; font-stretch: 115%; padding: 16px 28px; border-radius: 10px;
-    transition: transform .12s ease;
+    font-family: var(--sans); margin-top: clamp(28px, 4vh, 44px); background: var(--blue); color: var(--on-blue); border: 0; cursor: pointer;
+    font-size: 18px; font-weight: 650; padding: 16px 28px; border-radius: 10px; transition: transform .12s ease;
   }
   .go:active { transform: scale(.98); }
-  .error { color: var(--blue); font-size: 16px; min-height: 1.5em; margin: 14px 0 0; font-weight: 600; }
+  .error { font-family: var(--sans); color: var(--blue); font-size: 16px; min-height: 1.5em; margin: 14px 0 0; font-weight: 600; }
 
   /* Reveal */
   .reveal { min-height: 100svh; display: grid; grid-template-columns: minmax(300px, 5fr) 7fr; gap: clamp(32px, 5vw, 72px); align-items: center; padding-block: 48px; }
+  .readout { container-type: inline-size; min-width: 0; }
   .num {
-    font-size: clamp(72px, 9vw, 150px); font-size: min(172px, 24cqi); font-weight: 800; line-height: .82; letter-spacing: -0.03em;
-    font-stretch: 150%; color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap;
-    margin: 0 0 20px;
+    font-family: var(--sans); font-size: clamp(80px, 11vw, 170px); font-size: min(180px, 30cqi);
+    font-weight: 850; font-stretch: 125%; line-height: .82; letter-spacing: -0.03em;
+    color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap; margin: 0 0 20px;
   }
-  .cap { font-size: clamp(20px, 2vw, 26px); line-height: 1.3; margin: 0 0 32px; max-width: 17em; min-height: 2.6em; }
-  .switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+  .cap { font-size: clamp(22px, 2.2vw, 28px); line-height: 1.3; margin: 0 0 30px; max-width: 16em; min-height: 2.6em; }
+  .switch { font-family: var(--sans); position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
   .switch::before {
     content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
     background: var(--ink); border-radius: 999px; transition: transform .45s cubic-bezier(.65,0,.35,1);
@@ -112,27 +113,30 @@
   .switch[data-mode="cal"]::before { transform: translateX(100%); }
   .switch button {
     position: relative; z-index: 1; background: none; border: 0; cursor: pointer; padding: 10px 20px;
-    font-size: 16px; font-weight: 600; border-radius: 999px; white-space: nowrap; transition: color .3s;
+    font-size: 15px; font-weight: 600; border-radius: 999px; white-space: nowrap; transition: color .3s;
   }
   .switch button[aria-pressed="true"] { color: var(--ground); }
-  .key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 28px 0 0; padding: 0; list-style: none; font-size: 15px; color: var(--muted); }
+  .key { font-family: var(--sans); display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 26px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--muted); }
   .key li { display: inline-flex; align-items: center; gap: 8px; }
   .key i { width: 14px; height: 8px; border-radius: 4px; display: inline-block; }
-  .readout { container-type: inline-size; min-width: 0; }
   .plot { position: relative; min-width: 0; }
   #grid { display: block; width: 100%; touch-action: pan-y; }
 
   /* Story */
   .beat { padding-block: clamp(96px, 18vh, 180px); }
-  .say { margin: 0; font-weight: 700; font-size: clamp(34px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.02em; max-width: 16em; }
-  .say span { display: block; }
-  .say .wide { font-stretch: 145%; }
-  .say .narrow { font-stretch: 58%; color: var(--ink-2); }
-  .aside { margin: 28px 0 0; font-size: clamp(19px, 1.8vw, 23px); color: var(--ink-2); max-width: 30em; }
-  .aside strong { color: var(--blue); font-weight: 700; }
+  .say { margin: 0; font-weight: 400; font-size: clamp(32px, 4.6vw, 60px); line-height: 1.1; letter-spacing: -0.015em; max-width: 18em; }
+  .aside { margin: 28px 0 0; font-size: clamp(20px, 1.9vw, 24px); color: var(--ink-2); max-width: 30em; }
+  .aside strong { font-family: var(--sans); font-weight: 700; color: var(--blue); }
+
+  .years { margin-top: clamp(36px, 6vh, 56px); max-width: 820px; }
+  .yrow { display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: center; margin-top: 14px; }
+  .ylab { font-family: var(--sans); font-weight: 650; font-size: 15px; color: var(--ink-2); }
+  .ybar { display: flex; height: 32px; }
+  .ybar i { flex: 1; min-width: 0; background: color-mix(in srgb, var(--blue) 22%, transparent); border-radius: 3px; }
+  .ybar i.on { background: var(--blue); }
 
   /* Today */
-  .today h2 { margin: 0 0 12px; font-weight: 700; font-size: clamp(30px, 4vw, 52px); line-height: 1.05; letter-spacing: -0.02em; }
+  .today h2 { font-family: var(--sans); margin: 20px 0 0; font-weight: 800; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; }
   .checks { list-style: none; margin: 36px 0 0; padding: 0; border-top: 1.5px solid var(--ink); max-width: 820px; }
   .checks li { border-bottom: 1px solid var(--line); }
   .check {
@@ -144,28 +148,26 @@
     transition: background .25s, border-color .25s; margin-top: 2px;
   }
   .ring svg { width: 16px; height: 16px; opacity: 0; transform: scale(.6); transition: opacity .2s, transform .25s; }
-  .check .t { display: block; font-size: clamp(21px, 2.3vw, 28px); font-weight: 650; line-height: 1.15; transition: font-stretch .5s cubic-bezier(.65,0,.35,1), color .25s; }
-  .check .d { display: block; font-size: 16px; color: var(--muted); margin-top: 4px; }
+  .check .t { font-family: var(--sans); display: block; font-size: clamp(20px, 2.1vw, 25px); font-weight: 650; line-height: 1.2; transition: color .25s; }
+  .check .d { display: block; font-size: 17px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
   .check[aria-pressed="true"] .ring { background: var(--blue); border-color: var(--blue); }
   .check[aria-pressed="true"] .ring svg { opacity: 1; transform: none; }
-  .check[aria-pressed="true"] .t { font-stretch: 130%; color: var(--blue); }
-  .tally { margin: 20px 0 0; font-size: 17px; color: var(--muted); }
+  .check[aria-pressed="true"] .t { color: var(--blue); }
+  .tally { font-family: var(--sans); margin: 20px 0 0; font-size: 15px; color: var(--muted); }
 
   /* End */
   .end { padding-block: clamp(110px, 22vh, 220px) clamp(80px, 14vh, 140px); }
-  .left { margin: 0; font-weight: 800; font-size: clamp(52px, 10vw, 150px); line-height: .9; letter-spacing: -0.03em; font-stretch: 62%; }
-  .left b { color: var(--blue); font-weight: 800; }
+  .left { font-family: var(--sans); margin: 0; font-weight: 850; font-size: clamp(56px, 10vw, 150px); line-height: .9; letter-spacing: -0.03em; font-stretch: 62%; }
+  .left b { color: var(--blue); font-weight: 850; }
   .end .aside { margin-top: 20px; }
-  .share { margin-top: 36px; background: none; border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 22px; font-size: 17px; font-weight: 600; cursor: pointer; }
+  .share { font-family: var(--sans); margin-top: 36px; background: none; border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 22px; font-size: 16px; font-weight: 600; cursor: pointer; }
   .share:hover { background: var(--ink); color: var(--ground); }
 
-  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 15px; color: var(--muted); }
-  footer .shell { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; align-items: center; }
-  footer a { color: inherit; }
+  footer { border-top: 1px solid var(--line); padding: 24px 0 36px; }
 
   /* Tooltip */
   .tip {
-    position: fixed; z-index: 20; pointer-events: none; background: var(--tip-bg); color: var(--tip-fg);
+    font-family: var(--sans); position: fixed; z-index: 20; pointer-events: none; background: var(--tip-bg); color: var(--tip-fg);
     font-size: 14px; line-height: 1.35; padding: 8px 11px; border-radius: 8px; white-space: nowrap;
     transform: translate(-50%, calc(-100% - 12px)); opacity: 0; transition: opacity .12s;
   }
@@ -182,27 +184,28 @@
   @media (prefers-reduced-motion: reduce) { dialog[open] { animation: none; } }
   .sheet { padding: 28px clamp(20px, 5vw, 44px) 56px; }
   .sheet-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
-  .sheet h2 { margin: 0; font-size: 34px; font-weight: 750; font-stretch: 120%; letter-spacing: -0.02em; }
-  .sheet h3 { margin: 36px 0 10px; font-size: 21px; font-weight: 700; }
-  .sheet p, .sheet dd, .sheet li { font-size: 16px; color: var(--ink-2); line-height: 1.6; }
+  .sheet h2 { font-family: var(--sans); margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; }
+  .sheet h3 { font-family: var(--sans); margin: 36px 0 10px; font-size: 19px; font-weight: 700; }
+  .sheet p, .sheet dd { font-size: 18px; color: var(--ink-2); line-height: 1.6; }
   .sheet p { margin: 0 0 12px; }
-  .formula { font-size: 19px; font-weight: 600; color: var(--ink); background: var(--ground); border-radius: 10px; padding: 14px 16px; margin: 14px 0 16px; line-height: 1.45; }
+  .formula { font-family: var(--sans); font-size: 17px; font-weight: 600; color: var(--ink); background: var(--ground); border-radius: 10px; padding: 14px 16px; margin: 14px 0 16px; line-height: 1.45; }
   .sheet dl { margin: 0; }
-  .sheet dt { font-weight: 700; margin-top: 16px; }
+  .sheet dt { font-family: var(--sans); font-weight: 700; font-size: 16px; margin-top: 18px; }
   .sheet dd { margin: 4px 0 0; }
   .sheet ol { padding-left: 20px; margin: 0; }
-  .sheet li { font-size: 14px; margin-bottom: 6px; color: var(--muted); }
+  .sheet li { font-size: 15px; margin-bottom: 6px; color: var(--muted); line-height: 1.5; }
 
-  @media (min-width: 901px) { h1 { font-size: clamp(40px, 8vw, 116px); } }
   @media (max-width: 900px) {
-    body { font-size: 17px; }
+    body { font-size: 18px; }
     .reveal { grid-template-columns: 1fr; gap: 28px; align-items: start; padding-top: 56px; }
     .cap { margin-bottom: 24px; min-height: 0; }
     .key { margin-top: 20px; }
   }
   @media (max-width: 480px) {
-    .switch button { padding: 10px 16px; font-size: 15px; }
+    .switch button { padding: 10px 16px; font-size: 14.5px; }
     .check { grid-template-columns: 40px 1fr; gap: 12px; }
+    .yrow { grid-template-columns: 48px 1fr; gap: 10px; }
+    .ybar { height: 26px; }
   }
 </style>
 </head>
@@ -217,11 +220,7 @@
 
 <main>
   <section class="intro shell" id="top">
-    <h1>
-      <span style="font-stretch:62%">How much of your life</span>
-      <span style="font-stretch:100%">have you already</span>
-      <span style="font-stretch:150%">felt?</span>
-    </h1>
+    <h1>How much of your life have you already felt?</h1>
     <form class="madlib" id="form" novalidate>
       <p>I'm <input id="age" type="number" inputmode="decimal" min="0" max="120" step="1" value="30" aria-label="Your age in years">
          and expect to live to <span class="nw"><input id="life" type="number" inputmode="decimal" min="2" max="120" step="1" value="80" aria-label="Expected lifespan in years">.</span></p>
@@ -238,12 +237,12 @@
         <p class="cap" id="cap"></p>
         <div class="switch" id="switch" data-mode="felt" role="group" aria-label="Choose a view">
           <button type="button" data-mode="felt" aria-pressed="true">How it feels</button>
-          <button type="button" data-mode="cal" aria-pressed="false">How it is</button>
+          <button type="button" data-mode="cal" aria-pressed="false">On the calendar</button>
         </div>
         <ul class="key">
           <li><i style="background:var(--blue)"></i>Lived</li>
           <li><i style="background:var(--ahead)"></i>Still ahead</li>
-          <li><i style="background:var(--pre)"></i>Before your first memory</li>
+          <li><i style="background:var(--pre)"></i>Not remembered</li>
         </ul>
       </div>
       <div class="plot">
@@ -252,20 +251,14 @@
     </section>
 
     <section class="beat shell" id="why">
-      <p class="say">
-        <span class="wide" id="whyThen"></span>
-        <span class="narrow" id="whyNow"></span>
-      </p>
+      <p class="say" id="whySay"></p>
+      <div class="years" id="years" aria-hidden="true"></div>
       <p class="aside" id="whyAside"></p>
     </section>
 
-    <section class="beat shell">
-      <p class="say">The years that feel long are the ones full of memories.</p>
-      <p class="aside">You can't slow down the calendar, but you can fill it.</p>
-    </section>
-
     <section class="beat today shell" style="padding-top:0">
-      <h2>Make today one you'll remember.</h2>
+      <p class="say">The years that feel long are the ones full of memories.</p>
+      <h2>Make today one of them.</h2>
       <ul class="checks">
         <li><button class="check" type="button" data-k="new" aria-pressed="false">
           <span class="ring"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--on-blue)"><path d="M3 8.5l3.2 3.2L13 5"/></svg></span>
@@ -298,7 +291,6 @@
 <footer>
   <div class="shell">
     <button class="textbtn" type="button" data-open-method>How it works and sources</button>
-    <span>Inspired by Tim Urban's Life in Weeks and <a href="https://weeksoflife.com/" rel="noopener">weeksoflife.com</a>.</span>
   </div>
 </footer>
 
@@ -342,6 +334,7 @@
       <li>McGaugh, J. L. (2004). The amygdala modulates the consolidation of memories of emotionally arousing experiences. <em>Annual Review of Neuroscience</em>, 27, 1–28.</li>
       <li>Killingsworth, M. A. &amp; Gilbert, D. T. (2010). A wandering mind is an unhappy mind. <em>Science</em>, 330, 932.</li>
       <li>Kramer, R. S. S., Weger, U. W. &amp; Sharma, D. (2013). The effect of mindfulness meditation on time perception. <em>Consciousness and Cognition</em>, 22, 846–852.</li>
+      <li>Urban, T. (2014). Your Life in Weeks. <em>Wait But Why.</em></li>
     </ol>
   </div>
 </dialog>
@@ -357,20 +350,19 @@
   const ease = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
 
   let S = null;        // current model
-  let t = 1;           // 1 = how it feels, 0 = how it is
+  let t = 1;           // 1 = how it feels, 0 = on the calendar
   let sweep = 1;       // 0..1 progress of the first fill
   let played = false;
 
   // ---------- Model ----------
   function model(age, life, mem) {
-    const clamp = x => Math.min(1, Math.max(0, x));
     const totalWeeks = Math.round(life * WPY);
     return {
       age, life, mem, totalWeeks,
       livedWeeks: Math.min(Math.floor(age * WPY), totalWeeks),
       memWeeks: Math.floor(mem * WPY),
-      felt: a => a <= mem ? 0 : clamp(Math.log(a / mem) / Math.log(life / mem)),
-      clock: a => clamp(a / life),
+      felt: a => a <= mem ? 0 : clamp01(Math.log(a / mem) / Math.log(life / mem)),
+      clock: a => clamp01(a / life),
     };
   }
 
@@ -386,7 +378,7 @@
 
   // ---------- Inputs ----------
   const inputs = ['age', 'life', 'mem'].map($);
-  const fit = el => el.style.width = (Math.max(2, String(el.value).length) + 0.5) + 'ch';
+  const fit = el => el.style.width = (Math.max(2, String(el.value).length) + 0.6) + 'ch';
   let deb;
   inputs.forEach(el => {
     fit(el);
@@ -409,9 +401,8 @@
     if (r.err) return false;
     S = model(r.age, r.life, r.mem);
     try { history.replaceState(null, '', `#age=${r.age}&life=${r.life}&mem=${r.mem}`); } catch (e) {}
-    const story = $('story');
-    if (story.hidden) { story.hidden = false; }
-    if (fresh && !played) { sweep = 0; }
+    $('story').hidden = false;
+    if (fresh && !played) sweep = 0;
     size();
     words();
     draw();
@@ -422,7 +413,6 @@
   const ORD = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth'];
   const TENS = { 2: ['twenty', 'twentieth'], 3: ['thirty', 'thirtieth'], 4: ['forty', 'fortieth'], 5: ['fifty', 'fiftieth'], 6: ['sixty', 'sixtieth'], 7: ['seventy', 'seventieth'], 8: ['eighty', 'eightieth'], 9: ['ninety', 'ninetieth'] };
   function share(n) {
-    n = Math.max(1, Math.round(n));
     if (n === 1) return 'all';
     if (n === 2) return 'half';
     let w;
@@ -436,16 +426,21 @@
 
   function words() {
     const s = S;
-    const m = Math.max(1, Math.round(s.mem)), a = Math.round(s.age);
-    if (s.age > s.mem + 0.5) {
-      $('whyThen').textContent = `At ${m}, a year was ${share(m)} of your life.`;
-      $('whyNow').textContent = `At ${a}, it's ${share(a)}.`;
+    const m = Math.max(1, Math.round(s.mem)), a = Math.max(1, Math.round(s.age));
+    const years = $('years');
+    if (s.age > s.mem + 0.5 && a > m) {
+      $('whySay').textContent = `At ${m}, a year was ${share(m)} of your life. At ${a}, it's ${share(a)}.`;
+      years.innerHTML = [m, a].map(n => {
+        const segs = Array.from({ length: n }, (_, i) => `<i${i === n - 1 ? ' class="on"' : ''}></i>`).join('');
+        return `<div class="yrow"><span class="ylab">At ${n}</span><span class="ybar" style="gap:${n > 45 ? 1 : 2}px">${segs}</span></div>`;
+      }).join('');
+      years.hidden = false;
       const wk = 52 * s.mem / s.age;
       $('whyAside').innerHTML = `So this year will pass about as fast as <strong>${wk < 10 ? wk.toFixed(1) : Math.round(wk)} weeks</strong> did when you were ${yrs(s.mem)}.`;
     } else {
-      $('whyThen').textContent = `Right now, a year is a big part of your life.`;
-      $('whyNow').textContent = `It won't always feel that way.`;
-      $('whyAside').textContent = `Each year is compared with everything you've lived before it, so each one feels a little shorter than the last.`;
+      $('whySay').textContent = `Right now, a year is a big part of your life. It won't always feel that way.`;
+      years.hidden = true;
+      $('whyAside').textContent = `Each year is measured against everything you've lived before it, so each one feels a little shorter than the last.`;
     }
     const left = Math.max(0, s.totalWeeks - s.livedWeeks);
     if (left > 0) {
@@ -456,7 +451,7 @@
       $('leftAside').textContent = 'Including this one.';
     }
     const f = Math.round(s.felt(s.age) * 100), c = Math.round(s.clock(s.age) * 100);
-    $('grid').setAttribute('aria-label', `A grid of your weeks. By how it feels, ${f}% of the life you remember is behind you. By the calendar, ${c}% of your weeks have passed.`);
+    $('grid').setAttribute('aria-label', `A grid of your weeks. By how it feels, ${f}% of your life is already behind you. On the calendar, ${c}% has passed.`);
   }
 
   function readout() {
@@ -464,14 +459,14 @@
     const v = s.clock(ageS) + (s.felt(ageS) - s.clock(ageS)) * t;
     const num = $('num');
     num.textContent = Math.round(v * 100) + '%';
-    num.style.fontStretch = (60 + 90 * t) + '%';
+    num.style.fontStretch = (62 + 63 * t) + '%';
     let cap;
     if (t >= .5) {
-      cap = s.age <= s.mem ? `Your remembered life hasn't started yet. It's all ahead of you.`
-        : s.age >= s.life ? `of the life you expected already feels lived. Every week now is extra.`
-        : `of the life you remember already feels lived.`;
+      cap = s.age <= s.mem ? `Your remembered life has only just begun.`
+        : s.age >= s.life ? `of your life already feels lived. Every week now is extra.`
+        : `of your life already feels lived.`;
     } else {
-      cap = s.age >= s.life ? `of the weeks you expected have passed. You're in bonus time.` : `of your weeks have actually passed.`;
+      cap = s.age >= s.life ? `of the life you expected has passed. Every week now is extra.` : `of your life has actually passed.`;
     }
     const capEl = $('cap');
     if (capEl.textContent !== cap) capEl.textContent = cap;
@@ -559,7 +554,7 @@
       if (y < 6 || y > H - 4) continue;
       if (placed.some(py => Math.abs(py - y) < 14)) continue;
       placed.push(y);
-      ctx.font = `${c.strong ? 700 : 500} 12px Anybody, sans-serif`;
+      ctx.font = `${c.strong ? 700 : 500} 12px Archivo, sans-serif`;
       ctx.fillStyle = c.strong ? css('--ink') : css('--muted');
       ctx.fillText(c.text, GUT - 10, y);
     }
@@ -567,7 +562,7 @@
   }
 
   // ---------- Tweens ----------
-  let tRaf = 0;
+  let tRaf = 0, sRaf = 0;
   function morphTo(target) {
     cancelAnimationFrame(tRaf);
     if (sweep < 1) { cancelAnimationFrame(sRaf); sweep = 1; }
@@ -582,7 +577,6 @@
     tRaf = requestAnimationFrame(step);
   }
 
-  let sRaf = 0;
   function playSweep() {
     if (reduced) { sweep = 1; draw(); return; }
     const t0 = performance.now(), dur = 2200;
@@ -625,9 +619,9 @@
     let html;
     if (t >= .5) {
       const pct = (r.hF / H * 100);
-      html = `<b>Age ${r.a}</b><br>Feels like ${pct < 1 ? pct.toFixed(1) : Math.round(pct)}% of the life you remember`;
+      html = `<b>Age ${r.a}</b><br>Feels like ${pct < 1 ? pct.toFixed(1) : Math.round(pct)}% of your life`;
     } else {
-      const st = idx < S.memWeeks ? 'Before your first memory' : idx < S.livedWeeks ? 'Lived' : idx === S.livedWeeks ? 'This week' : 'Still ahead';
+      const st = idx < S.memWeeks ? 'Not remembered' : idx < S.livedWeeks ? 'Lived' : idx === S.livedWeeks ? 'This week' : 'Still ahead';
       html = `<b>Age ${r.a}, week ${w + 1}</b><br>${st}`;
     }
     tip.innerHTML = html;
