@@ -139,6 +139,35 @@
   .aside { margin: 28px 0 0; font-size: clamp(20px, 1.9vw, 24px); color: var(--ink-2); max-width: 30em; }
   .aside strong { font-family: var(--sans); font-weight: 700; color: var(--blue); }
 
+  .play { padding-bottom: clamp(48px, 8vh, 96px); }
+  .play .why-h { margin-bottom: 10px; }
+  .play-sub { margin-top: 0; }
+  .stage { display: flex; align-items: flex-end; gap: clamp(16px, 3vw, 40px); margin-top: clamp(28px, 5vh, 48px); }
+  .pfig { height: clamp(150px, 26vh, 260px); width: auto; overflow: visible; flex: none; }
+  .pcount { font-family: var(--sans); font-weight: 850; font-size: clamp(110px, 17vw, 230px); line-height: .8; letter-spacing: -0.03em; color: var(--blue); margin: 0; font-variant-numeric: tabular-nums; font-stretch: 125%; white-space: nowrap; }
+  .pcount small { font-size: 16px; font-weight: 600; color: var(--muted); letter-spacing: 0; font-stretch: 100%; margin-left: 12px; }
+  .lifebar { margin-top: 20px; max-width: 1084px; }
+  .lb-bars { position: relative; }
+  .lb-row { display: flex; height: 28px; }
+  .lb-row i { flex: 1; min-width: 0; border-radius: 3px; background: var(--ahead); }
+  .lb-row i.pre { background: var(--pre); }
+  .lb-fill { position: absolute; inset: 0; clip-path: inset(0 100% 0 0); }
+  .lb-fill i { background: var(--blue); }
+  .lb-fill i.fut { background: color-mix(in srgb, var(--blue) 45%, var(--ground)); }
+  .lb-top, .lb-bottom { position: relative; height: 28px; }
+  .lb-mark { position: absolute; transform: translateX(-50%); font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; transition: opacity .3s, color .3s; }
+  .lb-top .lb-mark { bottom: 8px; }
+  .lb-bottom .lb-mark { top: 8px; }
+  .lb-mark.half { opacity: 0; }
+  .lb-mark.half.on { opacity: 1; color: var(--ink-2); }
+  .lb-mark.you { color: var(--ink); }
+  .lb-mark.you.now { color: var(--blue); }
+  .lb-mark.edge-l { left: 0; transform: none; }
+  .lb-mark.edge-r { right: 0; transform: none; }
+  .play-end { min-height: 3.2em; opacity: 0; transition: opacity .6s ease; }
+  .play-end.on { opacity: 1; }
+  .play-end strong { font-family: var(--sans); font-weight: 700; color: var(--blue); }
+  .replay { margin-top: 20px; }
   .why-h { font-family: var(--sans); font-weight: 800; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 clamp(32px, 5vh, 52px); }
   .reason-t { font-family: var(--sans); font-size: clamp(18px, 1.8vw, 21px); font-weight: 650; color: var(--blue); margin: 0 0 12px; }
   .reasons { list-style: none; margin: clamp(56px, 9vh, 88px) 0 0; padding: 26px 0 0; border-top: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; max-width: 920px; }
@@ -215,6 +244,8 @@
     .fig-label { min-width: 0; margin: 0; font-size: 13px; }
     .finds li { grid-template-columns: 1fr; padding: 22px 0; }
     .reasons { grid-template-columns: 1fr; }
+    .pfig { height: 140px; }
+    .pcount small { display: block; margin: 10px 0 0; }
   }
   @media (max-width: 480px) {
     .switch button { padding: 10px 16px; font-size: 14.5px; }
@@ -276,6 +307,22 @@
       <div class="plot">
         <canvas id="grid" role="img" aria-label=""></canvas>
       </div>
+    </section>
+
+    <section class="beat shell play" id="play">
+      <h2 class="why-h">Watch your life play out</h2>
+      <p class="aside play-sub">Each year plays for as long as it feels.</p>
+      <div class="stage" aria-hidden="true">
+        <svg class="pfig" id="pfig" viewBox="0 0 100 200"></svg>
+        <p class="pcount" id="pcount"><span id="pnum">3</span><small>years old</small></p>
+      </div>
+      <div class="lifebar" aria-hidden="true">
+        <div class="lb-top"><span class="lb-mark half" id="lbHalf"></span></div>
+        <div class="lb-bars"><div class="lb-row" id="lbBase"></div><div class="lb-row lb-fill" id="lbFill"></div></div>
+        <div class="lb-bottom"><span class="lb-mark edge-l">Birth</span><span class="lb-mark you" id="lbYou">You</span><span class="lb-mark edge-r" id="lbEnd"></span></div>
+      </div>
+      <p class="aside play-end" id="playEnd" aria-live="polite"></p>
+      <button class="share replay" id="replay" type="button">Play</button>
     </section>
 
     <section class="beat shell" id="why">
@@ -471,6 +518,7 @@
     words();
     draw();
     if (sweep >= 1) figTo(S.age, youLabel()); else figSet(sweptAge(), `At ${Math.floor(sweptAge())}`);
+    playReset();
     return true;
   }
 
@@ -572,9 +620,16 @@
   const GLASSES = [[0, 0], [43, 0], [47, 1], [120, 1]];
   const F = {};
   ['fShadow', 'fCane', 'fLegL', 'fLegR', 'fShoeL', 'fShoeR', 'fUpper', 'fArmL', 'fArmR', 'fTorso', 'fHead', 'fHair', 'fGlasses', 'fG1', 'fG2', 'fGb'].forEach(id => F[id] = $(id));
+  // A second copy of the figure (used by the player) with the same parts, found by data-p.
+  function cloneFigure(svg) {
+    svg.innerHTML = $('fig').innerHTML.replace(/ id="(f[A-Za-z0-9]+)"/g, ' data-p="$1"');
+    const E = {};
+    svg.querySelectorAll('[data-p]').forEach(n => E[n.dataset.p] = n);
+    return E;
+  }
   const set = (el, a) => { for (const k in a) el.setAttribute(k, typeof a[k] === 'number' ? +a[k].toFixed(2) : a[k]); };
 
-  function figure(age) {
+  function figure(age, E = F) {
     const h = interp(HEIGHT, age), head = h / interp(HEADS, age), leg = h * interp(LEGS, age);
     const g = 196, cx = 44, hip = g - leg;
     const neck = head * 0.08, top = g - h + head + neck;
@@ -583,36 +638,36 @@
     const sw = h * lerp(0.2, 0.22, kid), hw = sw * 0.78, rs = sw * 0.32, arm = h * 0.34;
     const r = head / 2, hy = top - neck - r, hr = r * 1.05;
     const lean = interp(LEAN, age), rad = d => d * Math.PI / 180;
-    set(F.fLegL, { x: cx - lw - 0.7, y: hip - 3, width: lw, height: leg + 3, rx: lw / 2 });
-    set(F.fLegR, { x: cx + 0.7, y: hip - 3, width: lw, height: leg + 3, rx: lw / 2 });
+    set(E.fLegL, { x: cx - lw - 0.7, y: hip - 3, width: lw, height: leg + 3, rx: lw / 2 });
+    set(E.fLegR, { x: cx + 0.7, y: hip - 3, width: lw, height: leg + 3, rx: lw / 2 });
     const sh = lw * 0.55;
-    set(F.fShoeL, { x: cx - lw * 1.3 - 0.7, y: g - sh, width: lw * 1.3, height: sh, rx: sh / 2 });
-    set(F.fShoeR, { x: cx + 0.7, y: g - sh, width: lw * 1.3, height: sh, rx: sh / 2 });
-    set(F.fTorso, { d: `M${cx - sw / 2} ${top + rs}Q${cx - sw / 2} ${top} ${cx - sw / 2 + rs} ${top}L${cx + sw / 2 - rs} ${top}Q${cx + sw / 2} ${top} ${cx + sw / 2} ${top + rs}L${cx + hw / 2} ${hip}L${cx - hw / 2} ${hip}Z` });
+    set(E.fShoeL, { x: cx - lw * 1.3 - 0.7, y: g - sh, width: lw * 1.3, height: sh, rx: sh / 2 });
+    set(E.fShoeR, { x: cx + 0.7, y: g - sh, width: lw * 1.3, height: sh, rx: sh / 2 });
+    set(E.fTorso, { d: `M${cx - sw / 2} ${top + rs}Q${cx - sw / 2} ${top} ${cx - sw / 2 + rs} ${top}L${cx + sw / 2 - rs} ${top}Q${cx + sw / 2} ${top} ${cx + sw / 2} ${top + rs}L${cx + hw / 2} ${hip}L${cx - hw / 2} ${hip}Z` });
     // Arms hang from the shoulders, angled slightly outwards
     const ax = sw / 2 + 0.9, ay = top + rs * 0.35;
-    set(F.fArmL, { x: cx - ax - aw, y: ay, width: aw, height: arm, rx: aw / 2, transform: `rotate(7 ${cx - ax - aw / 2} ${ay})` });
-    set(F.fArmR, { x: cx + ax, y: ay, width: aw, height: arm, rx: aw / 2, transform: `rotate(-7 ${cx + ax + aw / 2} ${ay})` });
-    set(F.fHead, { cx, cy: hy, r });
+    set(E.fArmL, { x: cx - ax - aw, y: ay, width: aw, height: arm, rx: aw / 2, transform: `rotate(7 ${cx - ax - aw / 2} ${ay})` });
+    set(E.fArmR, { x: cx + ax, y: ay, width: aw, height: arm, rx: aw / 2, transform: `rotate(-7 ${cx + ax + aw / 2} ${ay})` });
+    set(E.fHead, { cx, cy: hy, r });
     // Short hair that covers the sides, receding and greying with age
     const rec = interp(RECEDE, age), side = hy + r * (0.25 - 0.2 * rec), line = hy - r * (0.3 + 0.45 * rec);
     const hdx = Math.sqrt(hr * hr - (side - hy) ** 2);   // keeps the hair arc centred on the head
-    set(F.fHair, {
+    set(E.fHair, {
       d: `M${cx - hdx} ${side}A${hr} ${hr} 0 1 1 ${cx + hdx} ${side}C${cx + r * 0.85} ${line} ${cx - r * 0.85} ${line} ${cx - hdx} ${side}Z`,
       style: `fill:color-mix(in srgb, var(--hair-old) ${Math.round(interp(GREY, age) * 100)}%, var(--hair-young))`,
     });
     const ey = hy + r * 0.18, gr = r * 0.22;
-    set(F.fG1, { cx: cx - r * 0.36, cy: ey, r: gr });
-    set(F.fG2, { cx: cx + r * 0.36, cy: ey, r: gr });
-    set(F.fGb, { x1: cx - r * 0.14, y1: ey, x2: cx + r * 0.14, y2: ey });
-    set(F.fGlasses, { opacity: interp(GLASSES, age) });
-    F.fUpper.setAttribute('transform', `rotate(${lean.toFixed(2)} ${cx} ${hip})`);
+    set(E.fG1, { cx: cx - r * 0.36, cy: ey, r: gr });
+    set(E.fG2, { cx: cx + r * 0.36, cy: ey, r: gr });
+    set(E.fGb, { x1: cx - r * 0.14, y1: ey, x2: cx + r * 0.14, y2: ey });
+    set(E.fGlasses, { opacity: interp(GLASSES, age) });
+    E.fUpper.setAttribute('transform', `rotate(${lean.toFixed(2)} ${cx} ${hip})`);
     // The cane starts at the right hand: the arm's angle first, then the body's lean
     const hx0 = cx + ax + aw / 2 + arm * Math.sin(rad(7)), hy0 = ay + arm * Math.cos(rad(7));
     const px = hx0 - cx, py = hy0 - hip, th = rad(lean);
     const hx = cx + px * Math.cos(th) - py * Math.sin(th), hyy = hip + px * Math.sin(th) + py * Math.cos(th);
-    set(F.fCane, { d: `M${hx - 4.5} ${hyy - 1}Q${hx - 1.5} ${hyy - 7.5} ${hx + 1.5} ${hyy - 2}L${hx + 2.5} ${g}`, opacity: interp(CANE, age) });
-    set(F.fShadow, { rx: 8 + h * 0.08 });
+    set(E.fCane, { d: `M${hx - 4.5} ${hyy - 1}Q${hx - 1.5} ${hyy - 7.5} ${hx + 1.5} ${hyy - 2}L${hx + 2.5} ${g}`, opacity: interp(CANE, age) });
+    set(E.fShadow, { rx: 8 + h * 0.08 });
   }
 
   const FIG = { age: -1, target: 0, label: '', raf: 0 };
@@ -871,6 +926,83 @@
     back = setTimeout(() => { if (S && sweep >= 1) figTo(S.age, youLabel()); }, e.pointerType === 'touch' ? 2500 : 0);
   });
   addEventListener('scroll', hideTip, { passive: true });
+
+  // ---------- Play your life ----------
+  // Inspired by Maximilian Kiener's "Why Time Flies": each remembered year plays for as
+  // long as it feels, so the playback speeds up exactly the way the model says life does.
+  const PF = cloneFigure($('pfig'));
+  const PT = 18000, HOLD = 900;
+  const PLAY = { raf: 0, auto: false };
+  const secs = x => x < 1 ? x.toFixed(1) : String(Math.round(x));
+
+  function playReset() {
+    const s = S, R = Math.ceil(s.life), gap = R > 45 ? 1 : 2;
+    cancelAnimationFrame(PLAY.raf);
+    const segs = fut => Array.from({ length: R }, (_, a) =>
+      `<i class="${a + 1 <= s.mem ? 'pre' : (fut && a + 1 > s.age ? 'fut' : '')}"></i>`).join('');
+    $('lbBase').innerHTML = segs(false); $('lbFill').innerHTML = segs(true);
+    $('lbBase').style.gap = $('lbFill').style.gap = gap + 'px';
+    $('lbEnd').textContent = yrs(s.life);
+    const half = Math.sqrt(s.mem * s.life);
+    $('lbHalf').textContent = `Half of it felt by ${Math.round(half)}`;
+    placeMark($('lbHalf'), half / s.life);
+    const you = $('lbYou');
+    you.hidden = !(s.age > s.mem && s.age < s.life);
+    placeMark(you, s.age / s.life);
+    you.classList.remove('now');
+    $('playEnd').classList.remove('on');
+    playFrame(s.mem, 0);
+  }
+  function placeMark(el, x) {
+    el.style.left = (x * 100).toFixed(2) + '%';
+    el.style.transform = x < 0.08 ? 'none' : x > 0.92 ? 'translateX(-100%)' : '';
+  }
+  function playFrame(age, f) {
+    const s = S;
+    $('pnum').textContent = Math.floor(age);
+    $('pcount').style.fontStretch = (62 + 63 * (1 - f)).toFixed(1) + '%';
+    $('lbFill').style.clipPath = `inset(0 ${(100 - Math.min(1, age / s.life) * 100).toFixed(2)}% 0 0)`;
+    $('lbHalf').classList.toggle('on', age >= Math.sqrt(s.mem * s.life) - 1e-6);
+    figure(age, PF);
+  }
+  function playEnd() {
+    const s = S, fYou = s.age > s.mem ? Math.min(1, s.felt(s.age)) : 0;
+    const t1 = PT * fYou / 1000, t2 = PT * (1 - fYou) / 1000;
+    let html;
+    if (s.age <= s.mem) html = `All ${yrs(s.life - s.mem)} remembered years are still ahead of you. They took <strong>${secs(PT / 1000)} seconds</strong>.`;
+    else if (s.age >= s.life) html = `Your ${yrs(s.life - s.mem)} remembered years took <strong>${secs(PT / 1000)} seconds</strong>. Every year from here is extra.`;
+    else html = `Your first ${yrs(s.age - s.mem)} remembered years took <strong>${secs(t1)} seconds</strong>. The ${yrs(s.life - s.age)} you have left took <strong>${secs(t2)} seconds</strong>.`;
+    $('playEnd').innerHTML = html;
+    $('playEnd').classList.add('on');
+    $('lbYou').classList.remove('now');
+    $('replay').textContent = 'Play it again';
+  }
+  function play() {
+    const s = S;
+    if (!s) return;
+    playReset();
+    $('replay').textContent = 'Restart';
+    if (reduced) { playFrame(s.life, 1); playEnd(); return; }
+    const fYou = s.age > s.mem && s.age < s.life ? s.felt(s.age) : 0, t1 = PT * fYou;
+    const t0 = performance.now();
+    const step = now => {
+      let e = Math.max(0, now - t0);
+      // Pause briefly on "You" before playing the years still ahead
+      const holding = fYou > 0 && e > t1 && e < t1 + HOLD;
+      if (fYou > 0 && e > t1) e = holding ? t1 : e - HOLD;
+      $('lbYou').classList.toggle('now', holding);
+      const f = clamp01(e / PT);
+      playFrame(s.mem * Math.pow(s.life / s.mem, f), f);
+      if (f < 1) PLAY.raf = requestAnimationFrame(step); else playEnd();
+    };
+    PLAY.raf = requestAnimationFrame(step);
+  }
+  $('replay').addEventListener('click', play);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting && S && !PLAY.auto) { PLAY.auto = true; play(); }
+    }), { threshold: 0.6 }).observe($('play').querySelector('.stage'));
+  }
 
   addEventListener('resize', () => { if (!S) return; size(); draw(); });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { PAL = null; LAYERS = null; draw(); });
