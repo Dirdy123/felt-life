@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Felt Life</title>
 <meta name="description" content="How much of your life have you already felt? See your weeks stretch into how they feel.">
+<meta name="theme-color" content="#ECEDF0">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dirdy123.github.io/felt-life/">
 <meta property="og:title" content="How much of your life have you already felt?">
-<meta property="og:description" content="Three numbers. One grid of your weeks, drawn by how long they feel.">
+<meta property="og:description" content="Three numbers. See your life in weeks, drawn by how long they feel, and watch it play out.">
+<meta property="og:image" content="https://dirdy123.github.io/felt-life/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A grid of weeks where the childhood years are drawn tall, next to the number 70%.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect x='2' y='1' width='12' height='7' rx='2' fill='%232E3BF0'/><rect x='2' y='10' width='12' height='2.5' rx='1.25' fill='%232E3BF0'/><rect x='2' y='14' width='12' height='1' rx='.5' fill='%232E3BF0'/></svg>">
 <script>document.documentElement.classList.add("loading");setTimeout(function(){document.documentElement.classList.remove("loading")},2000)</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -207,7 +215,9 @@
   .share { font-family: var(--sans); margin-top: 36px; background: none; border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 22px; font-size: 16px; font-weight: 600; cursor: pointer; }
   .share:hover { background: var(--ink); color: var(--ground); }
 
+  .share-note { font-family: var(--sans); font-size: 15px; color: var(--muted); margin: 12px 0 0; min-height: 1.4em; }
   footer { border-top: 1px solid var(--line); padding: 24px 0 36px; }
+  footer .shell { display: flex; gap: 12px 28px; flex-wrap: wrap; }
 
   /* Tooltip */
   .tip {
@@ -400,7 +410,8 @@
     <section class="end shell">
       <p class="left" id="left"></p>
       <p class="aside" id="leftAside">This is one of them. Close this tab and go live it.</p>
-      <button class="share" id="share" type="button">Copy link to my results</button>
+      <button class="share" id="share" type="button">Share my result</button>
+      <p class="share-note" id="shareNote" role="status"></p>
     </section>
   </div>
 </main>
@@ -408,6 +419,7 @@
 <footer>
   <div class="shell">
     <button class="textbtn" type="button" data-open-method>How it works and sources</button>
+    <a class="textbtn" href="https://github.com/Dirdy123/felt-life/issues" rel="noopener">Send feedback</a>
   </div>
 </footer>
 
@@ -1057,11 +1069,20 @@
   });
 
   // ---------- Share ----------
+  // Shares the result as a sentence plus the plain site link. The link leaves out the
+  // numbers, so friends start with their own and the sharer's age isn't passed along.
   $('share').addEventListener('click', async () => {
-    const b = $('share');
-    try { await navigator.clipboard.writeText(location.href); b.textContent = 'Link copied'; }
-    catch (e) { b.textContent = 'Copy the address from your browser'; }
-    setTimeout(() => b.textContent = 'Copy link to my results', 2400);
+    const url = location.href.split('#')[0];
+    const pct = S ? Math.round(S.felt(S.age) * 100) : null;
+    const text = pct !== null ? `I may have already felt ${pct}% of my life. How much have you?` : 'How much of your life have you already felt?';
+    const note = $('shareNote');
+    if (navigator.share) {
+      try { await navigator.share({ title: document.title, text, url }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.writeText(`${text} ${url}`); note.textContent = 'Copied. Paste it anywhere.'; }
+    catch (e) { note.textContent = `Copy this: ${text} ${url}`; }
+    setTimeout(() => note.textContent = '', 4000);
   });
 
   // ---------- Method sheet ----------
