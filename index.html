@@ -223,7 +223,7 @@
   </section>
 
   <div id="story" hidden>
-    <section class="reveal shell" id="reveal" aria-live="polite">
+    <section class="reveal shell" id="reveal">
       <div class="readout">
         <p class="num" id="num">0%</p>
         <p class="cap" id="cap"></p>
@@ -336,7 +336,7 @@
 
 <script>
 (() => {
-  const WPY = 52.1775;
+  const WPY = 52;
   const $ = id => document.getElementById(id);
   const fmt = n => Math.round(n).toLocaleString('en-US');
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -397,6 +397,7 @@
     $('error').textContent = r.err || '';
     if (r.err) return false;
     S = model(r.age, r.life, r.mem);
+    LAYERS = null;
     try { history.replaceState(null, '', `#age=${r.age}&life=${r.life}&mem=${r.mem}`); } catch (e) {}
     $('story').hidden = false;
     if (fresh && !played) sweep = 0;
@@ -480,8 +481,12 @@
   }
 
   // ---------- Grid ----------
+  // One row per year, 52 weeks per row. Drawing thousands of rounded cells every frame
+  // is too slow on phones, so while the layout is at rest (fully "felt" or fully
+  // "calendar") the cells are painted once into two offscreen layers, and each frame
+  // only reveals part of the blue layer. Full redraws happen only during the morph.
   const cv = $('grid'), ctx = cv.getContext('2d');
-  let W = 0, H = 0, lastW = 0, rows = [];
+  let W = 0, H = 0, DPR = 1, lastW = 0, rows = [], LAYERS = null;
   const GUT = 40;
 
   function size() {
@@ -490,10 +495,11 @@
     lastW = w; W = w;
     const narrow = innerWidth < 900;
     H = Math.round(narrow ? Math.min(620, Math.max(380, innerHeight * 0.62)) : Math.min(800, Math.max(460, innerHeight * 0.8)));
-    const dpr = window.devicePixelRatio || 1;
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
     cv.style.height = H + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    LAYERS = null;
   }
 
   function geometry() {
@@ -509,51 +515,95 @@
     }
   }
 
+  const colW = () => (W - GUT) / 52;
+  const rr = (p, x, y, w, h, r) => (p.roundRect && r >= 2.5) ? p.roundRect(x, y, w, h, r) : p.rect(x, y, w, h);
+
+  // Position and size of one week's cell, or null if its row has collapsed.
+  function cell(idx) {
+    const r = rows[Math.floor(idx / 52)];
+    if (!r) return null;
+    const cwid = colW(), gapX = Math.max(1, cwid * 0.22);
+    const gapY = Math.min(2, r.h * 0.28), ch = r.h - gapY;
+    if (ch < 0.35) return null;
+    const gapC = Math.min(2, r.hC * 0.28);
+    const dot = Math.max(1, Math.min(cwid - gapX, r.hC - gapC));
+    const cw = dot + (cwid - gapX - dot) * t;
+    return { x: GUT + (idx % 52) * cwid + (cwid - cw) / 2, y: r.y + gapY / 2, w: cw, h: ch, r: Math.min(cw, ch) / 2 };
+  }
+
+  // Paths for every cell. livedTo: weeks below this index are blue.
+  function paths(livedTo, withNow) {
+    const s = S, P = { lived: new Path2D(), ahead: new Path2D(), pre: new Path2D(), now: new Path2D() };
+    for (let idx = 0; idx < s.totalWeeks; idx++) {
+      const c = cell(idx);
+      if (!c) { idx = (Math.floor(idx / 52) + 1) * 52 - 1; continue; }
+      const p = idx < s.memWeeks ? P.pre
+        : (withNow && idx === s.livedWeeks) ? P.now
+        : idx < livedTo ? P.lived : P.ahead;
+      rr(p, c.x, c.y, c.w, c.h, c.r);
+    }
+    return P;
+  }
+
+  function layer(fill) {
+    const c = document.createElement('canvas');
+    c.width = cv.width; c.height = cv.height;
+    const x = c.getContext('2d');
+    x.setTransform(DPR, 0, 0, DPR, 0, 0);
+    fill(x);
+    return c;
+  }
+
+  function buildLayers() {
+    const C = pal(), P = paths(S.livedWeeks, false);
+    LAYERS = {
+      t,
+      base: layer(x => { x.fillStyle = C.ahead; x.fill(P.ahead); x.fill(P.lived); x.fillStyle = C.pre; x.fill(P.pre); }),
+      lived: layer(x => { x.fillStyle = C.blue; x.fill(P.lived); }),
+    };
+  }
+
   function draw() {
     if (!S || !W) return;
-    const s = S;
+    const s = S, C = pal();
     geometry();
     ctx.clearRect(0, 0, W, H);
-    const colW = (W - GUT) / 52, gapX = Math.max(1, colW * 0.22);
-    const livedF = sweep >= 1 ? s.livedWeeks : sweptAge() * WPY;
-    const edge = sweep >= 1 ? 0 : 16 * (1 - sweep);
-    const soft = [];
-    const P = { lived: new Path2D(), ahead: new Path2D(), pre: new Path2D(), now: new Path2D() };
-    const rr = (p, x, y, w, h, r) => p.roundRect ? p.roundRect(x, y, w, h, r) : p.rect(x, y, w, h);
 
-    for (const r of rows) {
-      const gapY = Math.min(2, r.h * 0.28), ch = r.h - gapY;
-      if (ch < 0.35) continue;
-      const gapC = Math.min(2, r.hC * 0.28);
-      const dot = Math.max(1, Math.min(colW - gapX, r.hC - gapC));
-      const cw = dot + (colW - gapX - dot) * t;
-      const rad = Math.min(cw, ch) / 2;
-      const base = Math.round(r.a * WPY);
-      for (let w = 0; w < 52; w++) {
-        const idx = base + w;
-        if (idx >= s.totalWeeks) break;
-        const x = GUT + w * colW + (colW - cw) / 2, y = r.y + gapY / 2;
-        let p;
-        if (idx < s.memWeeks) p = P.pre;
-        else if (sweep >= 1 && idx === s.livedWeeks) p = P.now;
-        else {
-          const a = edge > 0 ? clamp01((livedF - idx) / edge) : (idx < livedF ? 1 : 0);
-          if (a >= 1) p = P.lived;
-          else { p = P.ahead; if (a > 0) soft.push([x, y, cw, ch, rad, a]); }
-        }
-        rr(p, x, y, cw, ch, rad);
+    if (t === 0 || t === 1) {
+      if (!LAYERS || LAYERS.t !== t) buildLayers();
+      const livedF = sweep >= 1 ? s.livedWeeks : sweptAge() * 52;
+      const edge = sweep >= 1 ? 0 : 16 * (1 - sweep);
+      const solid = Math.max(s.memWeeks, Math.floor(livedF - edge));
+      ctx.drawImage(LAYERS.base, 0, 0, W, H);
+      // Reveal the blue layer up to the last fully lived week
+      ctx.save();
+      ctx.beginPath();
+      const row = rows[Math.floor(solid / 52)];
+      if (row) { ctx.rect(0, 0, W, row.y); ctx.rect(0, row.y, GUT + (solid % 52) * colW(), row.h); }
+      else ctx.rect(0, 0, W, H);
+      ctx.clip();
+      ctx.drawImage(LAYERS.lived, 0, 0, W, H);
+      ctx.restore();
+      // Soft leading edge while filling
+      ctx.fillStyle = C.blue;
+      for (let idx = solid; edge > 0 && idx < livedF && idx < s.totalWeeks; idx++) {
+        const c = cell(idx);
+        if (!c) continue;
+        ctx.globalAlpha = clamp01((livedF - idx) / edge);
+        ctx.beginPath(); rr(ctx, c.x, c.y, c.w, c.h, c.r); ctx.fill();
       }
+      ctx.globalAlpha = 1;
+      if (sweep >= 1 && s.livedWeeks < s.totalWeeks) {
+        const c = cell(s.livedWeeks);
+        if (c) { ctx.fillStyle = C.ink; ctx.beginPath(); rr(ctx, c.x, c.y, c.w, c.h, c.r); ctx.fill(); }
+      }
+    } else {
+      const P = paths(s.livedWeeks, true);
+      ctx.fillStyle = C.ahead; ctx.fill(P.ahead);
+      ctx.fillStyle = C.pre; ctx.fill(P.pre);
+      ctx.fillStyle = C.blue; ctx.fill(P.lived);
+      ctx.fillStyle = C.ink; ctx.fill(P.now);
     }
-    const C = pal();
-    ctx.fillStyle = C.ahead; ctx.fill(P.ahead);
-    ctx.fillStyle = C.pre; ctx.fill(P.pre);
-    ctx.fillStyle = C.blue; ctx.fill(P.lived);
-    ctx.fillStyle = C.ink; ctx.fill(P.now);
-    for (const [x, y, w, h, r, a] of soft) {
-      const e = new Path2D(); rr(e, x, y, w, h, r);
-      ctx.globalAlpha = a; ctx.fill(e);
-    }
-    ctx.globalAlpha = 1;
 
     // Age labels in the gutter
     const felt = t >= .5, placed = [];
@@ -586,10 +636,10 @@
     cancelAnimationFrame(tRaf);
     if (sweep < 1) { cancelAnimationFrame(sRaf); sweep = 1; }
     if (reduced) { t = target; draw(); return; }
-    const from = t, t0 = performance.now(), dur = 900;
+    const from = t, t0 = performance.now(), dur = 750;
     const step = now => {
       const p = clamp01((now - t0) / dur);
-      t = from + (target - from) * ease(p);
+      t = p >= 1 ? target : from + (target - from) * ease(p);
       draw();
       if (p < 1) tRaf = requestAnimationFrame(step);
     };
@@ -598,10 +648,10 @@
 
   function playSweep() {
     if (reduced) { sweep = 1; draw(); return; }
-    const t0 = performance.now(), dur = 2600;
+    const t0 = performance.now(), dur = 2000;
     const step = now => {
       const p = clamp01((now - t0) / dur);
-      sweep = ease(p);
+      sweep = p >= 1 ? 1 : ease(p);
       draw();
       if (p < 1) sRaf = requestAnimationFrame(step);
     };
@@ -633,7 +683,7 @@
     const colW = (W - GUT) / 52, w = Math.floor((x - GUT) / colW);
     const r = rows.find(r => y >= r.y && y < r.y + r.h && r.h > 0.3);
     if (!r || w < 0 || w > 51) return hideTip();
-    const idx = Math.round(r.a * WPY) + w;
+    const idx = r.a * 52 + w;
     if (idx >= S.totalWeeks) return hideTip();
     let html;
     if (t >= .5) {
@@ -656,7 +706,7 @@
   addEventListener('scroll', hideTip, { passive: true });
 
   addEventListener('resize', () => { if (!S) return; size(); draw(); });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { PAL = null; draw(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { PAL = null; LAYERS = null; draw(); });
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   Promise.race([fontsReady, new Promise(r => setTimeout(r, 1200))]).then(() => {
     document.documentElement.classList.remove('loading');
