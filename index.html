@@ -130,7 +130,6 @@
   .you { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 18px; }
   #fig { display: block; height: clamp(120px, 19vh, 180px); width: auto; overflow: visible; }
   .fig-label { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px; font-variant-numeric: tabular-nums; min-width: 6em; }
-  .sure { display: block; justify-self: start; margin-top: 14px; font-size: 14px; }
   .plot { position: relative; min-width: 0; }
   #grid { display: block; width: 100%; touch-action: pan-y; }
 
@@ -140,6 +139,12 @@
   .aside { margin: 28px 0 0; font-size: clamp(20px, 1.9vw, 24px); color: var(--ink-2); max-width: 30em; }
   .aside strong { font-family: var(--sans); font-weight: 700; color: var(--blue); }
 
+  .why-h { font-family: var(--sans); font-weight: 800; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 clamp(32px, 5vh, 52px); }
+  .reason-t { font-family: var(--sans); font-size: clamp(18px, 1.8vw, 21px); font-weight: 650; color: var(--blue); margin: 0 0 12px; }
+  .reasons { list-style: none; margin: clamp(56px, 9vh, 88px) 0 0; padding: 26px 0 0; border-top: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; max-width: 920px; }
+  .reasons h3 { font-family: var(--sans); margin: 0 0 8px; font-size: clamp(18px, 1.8vw, 21px); font-weight: 650; color: var(--blue); }
+  .reasons p { margin: 0; font-size: 19px; line-height: 1.55; color: var(--ink-2); }
+  .reasons cite, .finds cite { display: block; margin-top: 8px; font-family: var(--sans); font-style: normal; font-size: 13.5px; color: var(--muted); }
   .years { margin-top: clamp(36px, 6vh, 56px); max-width: 820px; }
   .yrow { display: grid; grid-template-columns: 64px 1fr; gap: 16px; align-items: center; margin-top: 14px; }
   .ylab { font-family: var(--sans); font-weight: 650; font-size: 15px; color: var(--ink-2); }
@@ -153,7 +158,6 @@
   .finds li { display: grid; grid-template-columns: 240px 1fr; gap: 8px 32px; padding: 26px 0; border-bottom: 1px solid var(--line); }
   .finds h3 { font-family: var(--sans); margin: 0; font-size: clamp(20px, 2vw, 24px); font-weight: 650; line-height: 1.2; }
   .finds p { margin: 0; font-size: 19px; line-height: 1.55; color: var(--ink-2); }
-  .finds cite { display: block; margin-top: 8px; font-family: var(--sans); font-style: normal; font-size: 13.5px; color: var(--muted); }
 
   /* End */
   .end { padding-block: clamp(110px, 22vh, 220px) clamp(80px, 14vh, 140px); }
@@ -210,6 +214,7 @@
     #fig { height: 112px; }
     .fig-label { min-width: 0; margin: 0; font-size: 13px; }
     .finds li { grid-template-columns: 1fr; padding: 22px 0; }
+    .reasons { grid-template-columns: 1fr; }
   }
   @media (max-width: 480px) {
     .switch button { padding: 10px 16px; font-size: 14.5px; }
@@ -262,7 +267,6 @@
           <button type="button" data-mode="felt" aria-pressed="true">How it feels</button>
           <button type="button" data-mode="cal" aria-pressed="false">On the calendar</button>
         </div>
-        <button class="textbtn sure" type="button" data-open-method="accuracy">How sure is this?</button>
         <ul class="key">
           <li><i style="background:var(--blue)"></i>Lived</li>
           <li><i style="background:var(--ahead)"></i>Still ahead</li>
@@ -275,9 +279,23 @@
     </section>
 
     <section class="beat shell" id="why">
+      <h2 class="why-h">Why life seems to speed up</h2>
+      <h3 class="reason-t">Each year is a smaller slice</h3>
       <p class="say" id="whySay"></p>
       <div class="years" id="years" aria-hidden="true"></div>
       <p class="aside" id="whyAside"></p>
+      <ul class="reasons">
+        <li>
+          <h3>Fewer firsts</h3>
+          <p>Childhood is full of first times. Adult weeks tend to repeat, and routine weeks leave fewer memories, so they shrink when you look back.</p>
+          <cite>Avni-Babad &amp; Ritov, 2003</cite>
+        </li>
+        <li>
+          <h3>More rush</h3>
+          <p>The more rushed people feel, the faster they say time goes. In surveys, this predicts the speed-up better than age does.</p>
+          <cite>Friedman &amp; Janssen, 2010</cite>
+        </li>
+      </ul>
     </section>
 
     <section class="beat today shell" style="padding-top:0">
@@ -309,7 +327,7 @@
 
     <section class="end shell">
       <p class="left" id="left"></p>
-      <p class="aside" id="leftAside">This is one of them.</p>
+      <p class="aside" id="leftAside">This is one of them. Close this tab and go live it.</p>
       <button class="share" id="share" type="button">Copy link to my results</button>
     </section>
   </div>
@@ -492,10 +510,10 @@
     const left = Math.max(0, s.totalWeeks - s.livedWeeks);
     if (left > 0) {
       $('left').innerHTML = `<b>${fmt(left)}</b> weeks left.`;
-      $('leftAside').textContent = 'This is one of them.';
+      $('leftAside').textContent = 'This is one of them. Close this tab and go live it.';
     } else {
       $('left').innerHTML = `Every week is <b>extra</b> now.`;
-      $('leftAside').textContent = 'Including this one.';
+      $('leftAside').textContent = 'Including this one. Close this tab and go live it.';
     }
     const f = Math.round(s.felt(s.age) * 100), c = Math.round(s.clock(s.age) * 100);
     const sq = s.age <= s.mem ? 0 : clamp01((Math.sqrt(s.age) - Math.sqrt(s.mem)) / (Math.sqrt(s.life) - Math.sqrt(s.mem)));
