@@ -36,8 +36,8 @@
     --pre: #9AA2BC;
     --tip-bg: #1A1C22;
     --tip-fg: #ECEDF0;
-    --hair-young: #1A1C22;
-    --hair-old: #B4B9C5;
+    --pwhite: #FFFFFF;
+    --pgrey: #A4AABB;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -53,8 +53,8 @@
       --pre: #4A5063;
       --tip-bg: #ECEDF1;
       --tip-fg: #16181E;
-      --hair-young: #0B0C10;
-      --hair-old: #D5D8DF;
+      --pwhite: #F1F2F5;
+      --pgrey: #7B8194;
     }
   }
 
@@ -135,6 +135,8 @@
   .key { font-family: var(--sans); display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 26px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--muted); }
   .key li { display: inline-flex; align-items: center; gap: 8px; }
   .key i { width: 14px; height: 8px; border-radius: 4px; display: inline-block; }
+  .pp { fill: var(--pp, var(--blue)); }
+  .pw { fill: var(--pwhite); stroke: #1A1C22; stroke-width: 1.2; }
   .you { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 18px; }
   #fig { display: block; height: clamp(120px, 19vh, 180px); width: auto; overflow: visible; }
   .fig-label { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px; font-variant-numeric: tabular-nums; min-width: 6em; }
@@ -306,14 +308,19 @@
       <div class="readout">
         <div class="you" aria-hidden="true">
           <svg id="fig" viewBox="0 0 100 200">
-            <ellipse id="fShadow" cx="44" cy="196.5" rx="20" ry="2.4" fill="var(--line)"/>
-            <path id="fCane" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/>
-            <g fill="var(--blue)"><rect id="fLegL"/><rect id="fLegR"/></g>
-            <g fill="var(--ink)"><rect id="fShoeL"/><rect id="fShoeR"/></g>
-            <g id="fUpper" fill="var(--blue)">
-              <rect id="fArmL"/><rect id="fArmR"/><path id="fTorso"/>
-              <circle id="fHead"/><path id="fHair"/>
-              <g id="fGlasses" fill="none" stroke="var(--ground)" stroke-width="1.1"><circle id="fG1"/><circle id="fG2"/><line id="fGb"/></g>
+            <ellipse id="fShadow" cx="46" cy="196.5" rx="20" ry="2.4" fill="var(--line)"/>
+            <path id="fCane" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/>
+            <g class="pp"><rect id="fLegL"/><rect id="fLegR"/></g>
+            <g id="fUpper">
+              <ellipse id="fBody" class="pw"/>
+              <ellipse id="fBand" class="pp"/>
+              <g class="pp"><rect id="fArmL"/><rect id="fArmR"/><circle id="fEarL"/><circle id="fEarR"/></g>
+              <circle id="fHead" class="pw"/>
+              <g class="pp"><ellipse id="fPatchL"/><ellipse id="fPatchR"/></g>
+              <g fill="#FFFFFF"><circle id="fEyeL"/><circle id="fEyeR"/></g>
+              <g fill="#1A1C22"><circle id="fPupL"/><circle id="fPupR"/><ellipse id="fNose"/></g>
+              <path id="fMouth" fill="none" stroke="#1A1C22" stroke-linecap="round"/>
+              <g id="fGlasses" fill="none" stroke="#1A1C22" stroke-width="1.3"><circle id="fG1"/><circle id="fG2"/><line id="fGb"/></g>
             </g>
           </svg>
           <p class="fig-label" id="figLabel"></p>
@@ -637,9 +644,9 @@
     if (capEl.textContent !== cap) capEl.textContent = cap;
   }
 
-  // ---------- Growing figure ----------
-  // A simple person drawn from age: height, head size and leg length follow rough growth
-  // curves; later come glasses, grey hair, a slight lean and a cane.
+  // ---------- Growing panda ----------
+  // A panda drawn from age: it grows from a round, big-headed cub into an adult, then
+  // gets glasses, faded patches, a slight lean and a bamboo walking stick.
   const lerp = (a, b, k) => a + (b - a) * k;
   function interp(tbl, x) {
     if (x <= tbl[0][0]) return tbl[0][1];
@@ -649,63 +656,64 @@
     return tbl[tbl.length - 1][1];
   }
   const HEIGHT = [[0, 50], [1, 75], [2, 87], [3, 95], [5, 110], [8, 128], [10, 138], [12, 150], [14, 162], [16, 171], [18, 175], [60, 175], [75, 171], [90, 166], [120, 163]];
-  const HEADS = [[0, 3.2], [2, 3.5], [5, 4.1], [10, 4.7], [15, 5.3], [20, 5.6], [120, 5.6]];   // height ÷ head height (stylised)
-  const LEGS = [[0, .3], [3, .34], [10, .4], [18, .43], [120, .43]];                      // leg length ÷ height
-  const LEAN = [[0, 0], [70, 0], [85, 3.5], [120, 5]];                                   // degrees, towards the cane
-  const RECEDE = [[0, 0], [68, 0], [90, 1], [120, 1]];
-  const GREY = [[0, 0], [42, 0], [58, .5], [74, 1], [120, 1]];
+  const PHEAD = [[0, 1.75], [3, 1.85], [8, 2], [14, 2.15], [20, 2.25], [120, 2.25]];    // height ÷ head diameter
+  const PBODY = [[0, .6], [3, .58], [10, .52], [20, .48], [60, .5], [120, .52]];         // body width ÷ height
+  const FADE = [[0, 0], [55, 0], [95, .55], [120, .6]];                                  // patches fading
+  const LEAN = [[0, 0], [70, 0], [85, 3.5], [120, 5]];                                   // degrees, towards the stick
   const CANE = [[0, 0], [73, 0], [78, 1], [120, 1]];
   const GLASSES = [[0, 0], [43, 0], [47, 1], [120, 1]];
-  const F = {};
-  ['fShadow', 'fCane', 'fLegL', 'fLegR', 'fShoeL', 'fShoeR', 'fUpper', 'fArmL', 'fArmR', 'fTorso', 'fHead', 'fHair', 'fGlasses', 'fG1', 'fG2', 'fGb'].forEach(id => F[id] = $(id));
-  // A second copy of the figure (used by the player) with the same parts, found by data-p.
+  const F = { svg: $('fig') };
+  $('fig').querySelectorAll('[id]').forEach(n => F[n.id] = n);
+  // A second copy of the panda (used by the player) with the same parts, found by data-p.
   function cloneFigure(svg) {
     svg.innerHTML = $('fig').innerHTML.replace(/ id="(f[A-Za-z0-9]+)"/g, ' data-p="$1"');
-    const E = {};
+    const E = { svg };
     svg.querySelectorAll('[data-p]').forEach(n => E[n.dataset.p] = n);
     return E;
   }
   const set = (el, a) => { for (const k in a) el.setAttribute(k, typeof a[k] === 'number' ? +a[k].toFixed(2) : a[k]); };
 
   function figure(age, E = F) {
-    const h = interp(HEIGHT, age), head = h / interp(HEADS, age), leg = h * interp(LEGS, age);
-    const g = 196, cx = 44, hip = g - leg;
-    const neck = head * 0.08, top = g - h + head + neck;
-    const kid = clamp01((12 - age) / 9);
-    const lw = h * lerp(0.065, 0.08, kid), aw = lw * 0.85;
-    const sw = h * lerp(0.2, 0.22, kid), hw = sw * 0.78, rs = sw * 0.32, arm = h * 0.34;
-    const r = head / 2, hy = top - neck - r, hr = r * 1.05;
-    const lean = interp(LEAN, age), rad = d => d * Math.PI / 180;
-    set(E.fLegL, { x: cx - lw - 0.7, y: hip - 3, width: lw, height: leg + 3, rx: lw / 2 });
-    set(E.fLegR, { x: cx + 0.7, y: hip - 3, width: lw, height: leg + 3, rx: lw / 2 });
-    const sh = lw * 0.55;
-    set(E.fShoeL, { x: cx - lw * 1.3 - 0.7, y: g - sh, width: lw * 1.3, height: sh, rx: sh / 2 });
-    set(E.fShoeR, { x: cx + 0.7, y: g - sh, width: lw * 1.3, height: sh, rx: sh / 2 });
-    set(E.fTorso, { d: `M${cx - sw / 2} ${top + rs}Q${cx - sw / 2} ${top} ${cx - sw / 2 + rs} ${top}L${cx + sw / 2 - rs} ${top}Q${cx + sw / 2} ${top} ${cx + sw / 2} ${top + rs}L${cx + hw / 2} ${hip}L${cx - hw / 2} ${hip}Z` });
+    const h = interp(HEIGHT, age) * 0.8, R = h / interp(PHEAD, age) / 2;
+    const g = 196, cx = 46, legH = h * 0.17, legW = h * 0.14, bw = h * interp(PBODY, age);
+    const hcy = g - h + R, bTop = hcy + R * 0.6, bBot = g - legH * 0.5;
+    const bcy = (bTop + bBot) / 2, bry = (bBot - bTop) / 2, pivot = g - legH;
+    const kid = clamp01((12 - age) / 9), lean = interp(LEAN, age), rad = d => d * Math.PI / 180;
+    E.svg.style.setProperty('--pp', `color-mix(in srgb, var(--pgrey) ${Math.round(interp(FADE, age) * 100)}%, var(--blue))`);
+    set(E.fLegL, { x: cx - bw * 0.28 - legW / 2, y: g - legH - 6, width: legW, height: legH + 6, rx: legW / 2 });
+    set(E.fLegR, { x: cx + bw * 0.28 - legW / 2, y: g - legH - 6, width: legW, height: legH + 6, rx: legW / 2 });
+    set(E.fBody, { cx, cy: bcy, rx: bw / 2, ry: bry });
+    set(E.fBand, { cx, cy: bTop + bry * 0.32, rx: bw / 2 * 0.9, ry: bry * 0.3 });
     // Arms hang from the shoulders, angled slightly outwards
-    const ax = sw / 2 + 0.9, ay = top + rs * 0.35;
-    set(E.fArmL, { x: cx - ax - aw, y: ay, width: aw, height: arm, rx: aw / 2, transform: `rotate(7 ${cx - ax - aw / 2} ${ay})` });
-    set(E.fArmR, { x: cx + ax, y: ay, width: aw, height: arm, rx: aw / 2, transform: `rotate(-7 ${cx + ax + aw / 2} ${ay})` });
-    set(E.fHead, { cx, cy: hy, r });
-    // Short hair that covers the sides, receding and greying with age
-    const rec = interp(RECEDE, age), side = hy + r * (0.25 - 0.2 * rec), line = hy - r * (0.3 + 0.45 * rec);
-    const hdx = Math.sqrt(hr * hr - (side - hy) ** 2);   // keeps the hair arc centred on the head
-    set(E.fHair, {
-      d: `M${cx - hdx} ${side}A${hr} ${hr} 0 1 1 ${cx + hdx} ${side}C${cx + r * 0.85} ${line} ${cx - r * 0.85} ${line} ${cx - hdx} ${side}Z`,
-      style: `fill:color-mix(in srgb, var(--hair-old) ${Math.round(interp(GREY, age) * 100)}%, var(--hair-young))`,
-    });
-    const ey = hy + r * 0.18, gr = r * 0.22;
-    set(E.fG1, { cx: cx - r * 0.36, cy: ey, r: gr });
-    set(E.fG2, { cx: cx + r * 0.36, cy: ey, r: gr });
-    set(E.fGb, { x1: cx - r * 0.14, y1: ey, x2: cx + r * 0.14, y2: ey });
+    const aw = h * 0.12, al = h * 0.26, sx = bw / 2 * 0.86, sy = bTop + bry * 0.3;
+    set(E.fArmL, { x: cx - sx - aw / 2, y: sy, width: aw, height: al, rx: aw / 2, transform: `rotate(14 ${cx - sx} ${sy})` });
+    set(E.fArmR, { x: cx + sx - aw / 2, y: sy, width: aw, height: al, rx: aw / 2, transform: `rotate(-14 ${cx + sx} ${sy})` });
+    set(E.fEarL, { cx: cx - R * 0.74, cy: hcy - R * 0.68, r: R * 0.4 });
+    set(E.fEarR, { cx: cx + R * 0.74, cy: hcy - R * 0.68, r: R * 0.4 });
+    set(E.fHead, { cx, cy: hcy, r: R });
+    // Eye patches slant down and outwards; cubs get bigger eyes
+    const ex = R * 0.34, ey = hcy + R * 0.04, er = R * lerp(0.1, 0.14, kid);
+    set(E.fPatchL, { cx: cx - ex, cy: ey + R * 0.04, rx: R * 0.25, ry: R * 0.33, transform: `rotate(30 ${cx - ex} ${ey})` });
+    set(E.fPatchR, { cx: cx + ex, cy: ey + R * 0.04, rx: R * 0.25, ry: R * 0.33, transform: `rotate(-30 ${cx + ex} ${ey})` });
+    set(E.fEyeL, { cx: cx - ex + R * 0.02, cy: ey, r: er });
+    set(E.fEyeR, { cx: cx + ex - R * 0.02, cy: ey, r: er });
+    set(E.fPupL, { cx: cx - ex + R * 0.04, cy: ey + er * 0.15, r: er * 0.6 });
+    set(E.fPupR, { cx: cx + ex - R * 0.04, cy: ey + er * 0.15, r: er * 0.6 });
+    set(E.fNose, { cx, cy: hcy + R * 0.4, rx: R * 0.14, ry: R * 0.09 });
+    set(E.fMouth, { d: `M${cx - R * 0.14} ${hcy + R * 0.53}q${R * 0.07} ${R * 0.1} ${R * 0.14} 0q${R * 0.07} ${R * 0.1} ${R * 0.14} 0`, 'stroke-width': Math.max(0.8, R * 0.05) });
+    set(E.fG1, { cx: cx - ex, cy: ey, r: R * 0.24 });
+    set(E.fG2, { cx: cx + ex, cy: ey, r: R * 0.24 });
+    set(E.fGb, { x1: cx - ex + R * 0.24, y1: ey, x2: cx + ex - R * 0.24, y2: ey });
     set(E.fGlasses, { opacity: interp(GLASSES, age) });
-    E.fUpper.setAttribute('transform', `rotate(${lean.toFixed(2)} ${cx} ${hip})`);
-    // The cane starts at the right hand: the arm's angle first, then the body's lean
-    const hx0 = cx + ax + aw / 2 + arm * Math.sin(rad(7)), hy0 = ay + arm * Math.cos(rad(7));
-    const px = hx0 - cx, py = hy0 - hip, th = rad(lean);
-    const hx = cx + px * Math.cos(th) - py * Math.sin(th), hyy = hip + px * Math.sin(th) + py * Math.cos(th);
-    set(E.fCane, { d: `M${hx - 4.5} ${hyy - 1}Q${hx - 1.5} ${hyy - 7.5} ${hx + 1.5} ${hyy - 2}L${hx + 2.5} ${g}`, opacity: interp(CANE, age) });
-    set(E.fShadow, { rx: 8 + h * 0.08 });
+    E.fUpper.setAttribute('transform', `rotate(${lean.toFixed(2)} ${cx} ${pivot})`);
+    // Bamboo stick from the right paw: the arm's angle first, then the body's lean
+    const hx0 = cx + sx + al * Math.sin(rad(14)), hy0 = sy + al * Math.cos(rad(14));
+    const px = hx0 - cx, py = hy0 - pivot, th = rad(lean);
+    const hx = cx + px * Math.cos(th) - py * Math.sin(th), hy = pivot + px * Math.sin(th) + py * Math.cos(th);
+    let d = `M${hx} ${hy - 4}L${hx + 1.5} ${g}`;
+    for (let k = 1; k <= 3; k++) { const y = hy - 4 + (g - hy + 4) * k / 4, x = hx + 1.5 * k / 4; d += `M${x - 1.8} ${y}L${x + 1.8} ${y}`; }
+    set(E.fCane, { d, opacity: interp(CANE, age) });
+    set(E.fShadow, { rx: bw * 0.55 });
   }
 
   const FIG = { age: -1, target: 0, label: '', raf: 0 };
