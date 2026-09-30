@@ -130,7 +130,7 @@
   .switch { font-family: var(--sans); position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
   .switch::before {
     content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
-    background: var(--ink); border-radius: 999px; transition: transform .45s cubic-bezier(.65,0,.35,1);
+    background: var(--ink); border-radius: 999px; transition: transform .6s cubic-bezier(.65,0,.35,1);
   }
   .switch[data-mode="cal"]::before { transform: translateX(100%); }
   .switch button {
@@ -486,7 +486,7 @@
 <footer>
   <div class="shell">
     <button class="textbtn" type="button" data-open-method>How it works and sources</button>
-    <a class="textbtn" href="https://github.com/madebyjs8/felt-life/issues" rel="noopener">Send feedback</a>
+    <a class="textbtn" href="https://github.com/madebyjs8/speed-of-years/issues" rel="noopener">Send feedback</a>
   </div>
 </footer>
 
@@ -719,7 +719,7 @@
         : s.age >= s.life ? `of your life may already feel lived. Every week now is extra.`
         : `of your life may already feel lived.`;
     } else {
-      cap = s.age >= s.life ? `of the life you expected has passed. Every week now is extra.` : `of your life has actually passed.`;
+      cap = s.age >= s.life ? `of the life you expected has passed. Every week now is extra.` : `of your life has actually passed: ${fmt(s.livedWeeks)} of ${fmt(s.totalWeeks)} weeks.`;
     }
     const capEl = $('cap');
     if (capEl.textContent !== cap) capEl.textContent = cap;
@@ -969,7 +969,7 @@
     cancelAnimationFrame(tRaf);
     if (sweep < 1) { cancelAnimationFrame(sRaf); sweep = 1; figTo(S.age, youLabel()); }
     if (reduced) { t = target; draw(); return; }
-    const from = t, t0 = performance.now(), dur = 750;
+    const from = t, t0 = performance.now(), dur = 1500;
     const step = now => {
       const p = clamp01((now - t0) / dur);
       t = p >= 1 ? target : from + (target - from) * ease(p);
@@ -1025,7 +1025,7 @@
       html = `<b>Age ${r.a}</b><br>Feels like ${pct < 1 ? pct.toFixed(1) : Math.round(pct)}% of your life`;
     } else {
       const st = idx < S.memWeeks ? 'Not remembered' : idx < S.livedWeeks ? 'Lived' : idx === S.livedWeeks ? 'This week' : 'Still ahead';
-      html = `<b>Age ${r.a}, week ${w + 1}</b><br>${st}`;
+      html = `<b>Week ${fmt(idx + 1)} of ${fmt(S.totalWeeks)}</b><br>${st}`;
     }
     // On touch the finger hides the grid and the figure may be off screen,
     // so show a small copy of the figure inside the tooltip.

@@ -29,4 +29,4 @@ To run it locally, open `index.html` in a browser.
 
 Inspired by Tim Urban's *Your Life in Weeks* and Maximilian Kiener's *Why Time Flies*. Full sources are listed in the site's "How it works" panel.
 
-Feedback and ideas: [open an issue](https://github.com/madebyjs8/felt-life/issues).
+Feedback and ideas: [open an issue](https://github.com/madebyjs8/speed-of-years/issues).
