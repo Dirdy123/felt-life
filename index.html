@@ -140,10 +140,13 @@
   .key li { display: inline-flex; align-items: center; gap: 8px; }
   .key i { width: 14px; height: 8px; border-radius: 4px; display: inline-block; }
   .pp { fill: var(--pp, var(--blue)); }
-  .pw { fill: url(#pShade); stroke: #AEB4C3; stroke-width: 1; vector-effect: non-scaling-stroke; }
-  .pad { fill: color-mix(in srgb, var(--pp, var(--blue)) 45%, #FFFFFF); }
+  .tskin { fill: #DCE0E9; stroke: #A3A9B9; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .tfar { fill: #BEC4D1; }
+  .trim { fill: color-mix(in srgb, var(--pp, var(--blue)) 78%, #0E1030); }
+  .seam { fill: none; stroke: color-mix(in srgb, var(--pp, var(--blue)) 45%, #FFFFFF); stroke-width: 1.6; stroke-linecap: round; }
+  .ring { fill: none; stroke: color-mix(in srgb, var(--pp, var(--blue)) 60%, #FFFFFF); stroke-width: 1.1; }
   .you { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 18px; }
-  #fig { display: block; height: clamp(120px, 19vh, 180px); width: auto; overflow: visible; }
+  #fig { display: block; height: clamp(84px, 13vh, 124px); width: auto; overflow: visible; }
   .fig-label { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink-2); margin: 0 0 6px; font-variant-numeric: tabular-nums; min-width: 6em; }
   .plot { position: relative; min-width: 0; }
   #grid { display: block; width: 100%; touch-action: pan-y; }
@@ -158,7 +161,7 @@
   .play .why-h { margin-bottom: 10px; }
   .play-sub { margin-top: 0; }
   .stage { display: flex; align-items: flex-end; gap: clamp(16px, 3vw, 40px); margin-top: clamp(28px, 5vh, 48px); }
-  .pfig { height: clamp(150px, 26vh, 260px); width: auto; overflow: visible; flex: none; }
+  .pfig { height: clamp(100px, 17vh, 170px); width: auto; overflow: visible; flex: none; }
   .pcount { font-family: var(--sans); font-weight: 850; font-size: clamp(110px, 17vw, 230px); line-height: .8; letter-spacing: -0.03em; color: var(--blue); margin: 0; font-variant-numeric: tabular-nums; font-stretch: 125%; white-space: nowrap; }
   .pside { display: flex; flex-direction: column; gap: 10px; padding-bottom: 4px; min-width: 7.5em; }
   .dial { width: 44px; height: 44px; display: block; }
@@ -268,12 +271,12 @@
     .readout > .num { grid-column: 1; grid-row: 1; margin: 0; font-size: min(180px, 24cqi); }
     .readout > .you { grid-column: 2; grid-row: 1; flex-direction: column; align-items: center; gap: 2px; margin: 0; }
     .readout > .cap { margin-top: 16px; }
-    #fig { height: 112px; }
+    #fig { height: 72px; }
     .fig-label { min-width: 0; margin: 0; font-size: 13px; }
     .finds li { grid-template-columns: 1fr; padding: 22px 0; }
     .reasons { grid-template-columns: 1fr; }
-    .pfig { height: 140px; }
-    .stage { gap: 14px; }
+    .stage { display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 12px 14px; }
+    .pfig { grid-column: 1 / -1; justify-self: start; height: 110px; }
     .pcount { font-size: clamp(88px, 25vw, 150px); }
     .pside { min-width: 0; gap: 8px; }
     .dial { width: 36px; height: 36px; }
@@ -288,7 +291,6 @@
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><radialGradient id="pShade" cx="42%" cy="34%" r="72%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".62" stop-color="#F6F7FA"/><stop offset="1" stop-color="#D9DDE7"/></radialGradient></defs></svg>
 
 <div class="shell">
   <header class="bar">
@@ -313,42 +315,38 @@
     <section class="reveal shell" id="reveal">
       <div class="readout">
         <div class="you" aria-hidden="true">
-          <svg id="fig" viewBox="0 0 140 160">
-            <ellipse id="fShadow" fill="var(--line)" ry="3"/>
+          <svg id="fig" viewBox="0 0 150 90">
+            <ellipse id="fShadow" fill="var(--line)" ry="2.6"/>
             <g id="fBodyG">
-              <ellipse class="pw" cx="0" cy="-37" rx="42" ry="37"/>
-              <ellipse class="pp" cx="0" cy="-64" rx="37" ry="10"/>
-              <ellipse class="pp" cx="-28" cy="-60" rx="17" ry="15"/>
-              <ellipse class="pp" cx="28" cy="-60" rx="17" ry="15"/>
-              <ellipse class="pp" cx="-29" cy="-13" rx="20" ry="14" transform="rotate(-20 -29 -13)"/>
-              <ellipse class="pp" cx="29" cy="-13" rx="20" ry="14" transform="rotate(20 29 -13)"/>
-              <ellipse class="pp" cx="-39" cy="-8" rx="12" ry="9.5"/>
-              <ellipse class="pp" cx="39" cy="-8" rx="12" ry="9.5"/>
-              <ellipse class="pad" cx="-39" cy="-7" rx="6" ry="4.6"/>
-              <ellipse class="pad" cx="39" cy="-7" rx="6" ry="4.6"/>
-              <g class="pad"><circle cx="-44" cy="-12.5" r="1.7"/><circle cx="-39" cy="-14" r="1.7"/><circle cx="-34" cy="-12.5" r="1.7"/><circle cx="34" cy="-12.5" r="1.7"/><circle cx="39" cy="-14" r="1.7"/><circle cx="44" cy="-12.5" r="1.7"/></g>
-              <g id="fCane" stroke="var(--ink)" stroke-linecap="round" fill="none">
-                <path d="M38 -1 L36 -82" stroke-width="3.2"/>
-                <path d="M34.5 -22 H39.2 M34 -44 H38.6 M33.5 -66 H38" stroke-width="1.6"/>
-                <path d="M36 -80 q9 -6 13 -2 q-6 4 -13 2 Z" fill="var(--ink)" stroke-width="0.8"/>
+              <rect class="tfar" x="-32" y="-19" width="13" height="19" rx="5"/>
+              <rect class="tfar" x="31" y="-19" width="13" height="19" rx="5"/>
+              <path class="tskin" d="M-50 -17 L-62 -11 L-50 -12 Z"/>
+              <path id="fNeckO" fill="none" stroke="#A3A9B9" stroke-width="15.5" stroke-linecap="round"/>
+              <path id="fNeck" fill="none" stroke="#DCE0E9" stroke-width="13.5" stroke-linecap="round"/>
+              <g id="fWrinkles" fill="none" stroke="#A3A9B9" stroke-width="1.1" stroke-linecap="round"></g>
+              <rect class="tskin" x="-45" y="-21" width="16" height="21" rx="6"/>
+              <rect class="tskin" x="21" y="-21" width="16" height="21" rx="6"/>
+              <g fill="#8E95A6"><ellipse cx="-41" cy="-1" rx="2.2" ry="1.4"/><ellipse cx="-35" cy="-1" rx="2.2" ry="1.4"/><ellipse cx="25" cy="-1" rx="2.2" ry="1.4"/><ellipse cx="31" cy="-1" rx="2.2" ry="1.4"/></g>
+              <path class="pp" d="M-50 -14 C-50 -50 -26 -68 2 -68 C32 -68 54 -50 54 -14 Z"/>
+              <path class="trim" d="M-53 -17 Q2 -24 57 -17 L56 -10 Q2 -16 -52 -10 Z"/>
+              <g class="seam">
+                <path d="M-43 -44 Q4 -58 49 -44"/>
+                <path d="M-49 -22 Q2 -30 53 -22"/>
+                <path d="M-20 -61 L-22 -48 M4 -68 L4 -53 M28 -64 L30 -49"/>
+                <path d="M-33 -44 L-36 -25 M-8 -50 L-8 -28 M18 -52 L18 -28 M40 -46 L43 -24"/>
+                <path d="M-44 -20 L-44 -13 M-33 -21 L-33 -14 M-22 -22 L-22 -15 M-11 -23 L-11 -16 M0 -23 L0 -16 M11 -23 L11 -16 M22 -23 L22 -16 M33 -22 L33 -15 M44 -21 L44 -14"/>
               </g>
-              <rect class="pp" x="-33" y="-62" width="15" height="41" rx="7.5" transform="rotate(12 -25.5 -62)"/>
-              <rect class="pp" x="18" y="-62" width="15" height="41" rx="7.5" transform="rotate(-12 25.5 -62)"/>
+              <g id="fRing1" class="ring"><rect x="-38" y="-54" width="8" height="4" rx="2"/><rect x="-13" y="-61" width="8" height="4" rx="2"/><rect x="12" y="-61" width="8" height="4" rx="2"/><rect x="35" y="-54" width="7" height="4" rx="2"/><rect x="-45" y="-36" width="6" height="4" rx="2"/><rect x="-25" y="-40" width="9" height="4" rx="2"/><rect x="1" y="-42" width="9" height="4" rx="2"/><rect x="25" y="-41" width="9" height="4" rx="2"/></g>
+              <g id="fRing2" class="ring"><rect x="-41" y="-56" width="14" height="8" rx="3.5"/><rect x="-16" y="-63" width="14" height="8" rx="3.5"/><rect x="9" y="-63" width="14" height="8" rx="3.5"/><rect x="32" y="-56" width="12" height="8" rx="3.5"/><rect x="-47" y="-38.5" width="10" height="9" rx="3"/><rect x="-28" y="-42.5" width="15" height="9" rx="3.5"/><rect x="-2" y="-44.5" width="15" height="9" rx="3.5"/><rect x="22" y="-43.5" width="15" height="9" rx="3.5"/></g>
             </g>
             <g id="fHeadG">
-              <circle class="pp" cx="-24" cy="-22" r="11"/>
-              <circle class="pp" cx="24" cy="-22" r="11"/>
-              <ellipse class="pw" cx="0" cy="0" rx="34" ry="29"/>
-              <ellipse fill="#F2F3F7" cx="0" cy="11" rx="12.5" ry="8.5"/>
-              <ellipse class="pp" cx="-13.5" cy="-1" rx="8.5" ry="12" transform="rotate(38 -13.5 -1)"/>
-              <ellipse class="pp" cx="13.5" cy="-1" rx="8.5" ry="12" transform="rotate(-38 13.5 -1)"/>
-              <circle id="fEyeL" fill="#1A1C22" cx="-12" cy="-3" r="2.6"/>
-              <circle id="fEyeR" fill="#1A1C22" cx="12" cy="-3" r="2.6"/>
-              <circle id="fGlintL" fill="#FFFFFF" cx="-11.2" cy="-3.9" r=".9"/>
-              <circle id="fGlintR" fill="#FFFFFF" cx="12.8" cy="-3.9" r=".9"/>
-              <path fill="#1A1C22" d="M-5 7 Q0 5.2 5 7 Q4.2 11 0 11.8 Q-4.2 11 -5 7 Z"/>
-              <path fill="none" stroke="#1A1C22" stroke-width="1" stroke-linecap="round" d="M0 11.8 L0 14 M-4.5 15.5 Q-2 17.5 0 14 Q2 17.5 4.5 15.5"/>
-              <g id="fGlasses" fill="none" stroke="#1A1C22" stroke-width="1.1"><circle cx="-12" cy="-3" r="6.8"/><circle cx="12" cy="-3" r="6.8"/><path d="M-5.2 -3.5 Q0 -6 5.2 -3.5"/></g>
+              <path class="tskin" d="M-11 4 Q-13 -9 1 -10.5 Q13 -11 16 -2.5 Q17.5 3.5 10.5 6 Q0 9.5 -11 4 Z"/>
+              <path fill="none" stroke="#6B7080" stroke-width="1" stroke-linecap="round" d="M4 3.2 Q9.5 4.6 15 1.4"/>
+              <circle fill="#6B7080" cx="14.2" cy="-3.4" r=".8"/>
+              <circle id="fEye" fill="#1A1C22" cx="5" cy="-3" r="2"/>
+              <circle id="fGlint" fill="#FFFFFF" cx="5.7" cy="-3.8" r=".7"/>
+              <path id="fLid" fill="none" stroke="#A3A9B9" stroke-width="1" stroke-linecap="round" d="M1.5 -6.2 Q5 -8 8.5 -6.2"/>
+              <g id="fGlasses" fill="none" stroke="#1A1C22" stroke-width="1"><circle cx="5" cy="-3" r="4.6"/><path d="M0.6 -4 L-7 -5.5"/></g>
             </g>
           </svg>
           <p class="fig-label" id="figLabel"></p>
@@ -673,8 +671,8 @@
   }
 
   // ---------- Growing panda ----------
-  // A panda drawn from age: it grows from a round, big-headed cub into an adult, then
-  // gets glasses, faded patches, a slight lean and a bamboo walking stick.
+  // A tortoise drawn from age: a big-headed hatchling grows into an adult whose shell plates
+  // gain growth rings; later come glasses, a faded shell, neck wrinkles and a lowered head.
   const lerp = (a, b, k) => a + (b - a) * k;
   function interp(tbl, x) {
     if (x <= tbl[0][0]) return tbl[0][1];
@@ -684,15 +682,15 @@
     return tbl[tbl.length - 1][1];
   }
   const HEIGHT = [[0, 50], [1, 75], [2, 87], [3, 95], [5, 110], [8, 128], [10, 138], [12, 150], [14, 162], [16, 171], [18, 175], [60, 175], [75, 171], [90, 166], [120, 163]];
-  const PHEAD = [[0, 1.75], [3, 1.85], [8, 2], [14, 2.15], [20, 2.25], [120, 2.25]];    // height ÷ head diameter
-  const PBODY = [[0, .6], [3, .58], [10, .52], [20, .48], [60, .5], [120, .52]];         // body width ÷ height
-  const FADE = [[0, 0], [55, 0], [95, .55], [120, .6]];                                  // patches fading
-  const DROOP = [[0, 0], [70, 0], [95, 1], [120, 1]];                                    // head sinking a little
-  const CANE = [[0, 0], [73, 0], [78, 1], [120, 1]];
+  const FADE = [[0, 0], [55, 0], [95, .55], [120, .6]];                                  // shell fading
+  const DROOP = [[0, 0], [68, 0], [95, 1], [120, 1]];                                    // head lowering a little
+  const RING1 = [[0, 0], [10, 0], [16, 1], [120, 1]];                                    // growth rings on the shell
+  const RING2 = [[0, 0], [32, 0], [42, 1], [120, 1]];
+  const WRINKLES = [[0, 0], [55, 0], [70, 1], [120, 1]];
   const GLASSES = [[0, 0], [43, 0], [47, 1], [120, 1]];
   const F = { svg: $('fig') };
   $('fig').querySelectorAll('[id]').forEach(n => F[n.id] = n);
-  // A second copy of the panda (used by the player) with the same parts, found by data-p.
+  // A second copy of the tortoise (used by the player) with the same parts, found by data-p.
   function cloneFigure(svg) {
     svg.innerHTML = $('fig').innerHTML.replace(/ id="(f[A-Za-z0-9]+)"/g, ' data-p="$1"');
     const E = { svg };
@@ -702,20 +700,29 @@
   const set = (el, a) => { for (const k in a) el.setAttribute(k, typeof a[k] === 'number' ? +a[k].toFixed(2) : a[k]); };
 
   function figure(age, E = F) {
-    // Body parts are drawn once in their own units; age only changes size and a few details
-    const k = interp(HEIGHT, age) / 175, kid = clamp01((12 - age) / 9);
-    const hs = 1.12 + 0.36 * kid;                                // big round head, bigger still on cubs
-    const g = 154, cx = 62, droop = interp(DROOP, age);
+    // Parts are drawn once in their own units; age only changes size and a few details
+    const k = interp(HEIGHT, age) / 175 * 0.95, kid = clamp01((12 - age) / 9);
+    const hs = 1 + 0.55 * kid;                                   // hatchlings have big heads
+    const g = 86, cx = 56, droop = interp(DROOP, age);
     E.svg.style.setProperty('--pp', `color-mix(in srgb, var(--pgrey) ${Math.round(interp(FADE, age) * 100)}%, var(--blue))`);
     E.fBodyG.setAttribute('transform', `translate(${cx} ${g}) scale(${k.toFixed(3)})`);
-    const hy = g + k * (-72 - 20 * hs + droop * 4);
-    E.fHeadG.setAttribute('transform', `translate(${cx} ${hy.toFixed(2)}) scale(${(k * hs).toFixed(3)}) rotate(${(-droop * 6).toFixed(2)})`);
-    const er = 2.6 + 1.3 * kid;
-    set(E.fEyeL, { r: er }); set(E.fEyeR, { r: er });
-    set(E.fGlintL, { r: er * 0.35 }); set(E.fGlintR, { r: er * 0.35 });
+    // Head position in body units: out in front of the shell, lower and tilted down with age
+    const hxU = 80 - 9 * kid, hyU = -33 + 6 * kid + droop * 8;
+    E.fHeadG.setAttribute('transform', `translate(${(cx + k * hxU).toFixed(2)} ${(g + k * hyU).toFixed(2)}) scale(${(k * hs).toFixed(3)}) rotate(${(droop * 12).toFixed(2)})`);
+    const neck = `M44 -24 Q${(hxU - 20).toFixed(1)} ${(hyU + 5).toFixed(1)} ${(hxU - 7).toFixed(1)} ${(hyU + 1.5).toFixed(1)}`;
+    set(E.fNeck, { d: neck }); set(E.fNeckO, { d: neck });
+    // Neck wrinkles: short arcs across the neck
+    let w = '';
+    for (let i = 1; i <= 3; i++) { const x = 56 + (hxU - 63) * i / 4, y = -22 + (hyU + 22) * i / 4; w += `M${(x - 2).toFixed(1)} ${(y - 5).toFixed(1)}q2.5 5 0 10`; }
+    set(E.fWrinkles, { opacity: interp(WRINKLES, age) });
+    if (E.fWrinkles.getAttribute('data-d') !== w) { E.fWrinkles.innerHTML = `<path d="${w}"/>`; E.fWrinkles.setAttribute('data-d', w); }
+    const er = 2 + 1.1 * kid;
+    set(E.fEye, { r: er }); set(E.fGlint, { r: er * 0.35 });
+    set(E.fLid, { opacity: interp(WRINKLES, age) });
+    set(E.fRing1, { opacity: interp(RING1, age) });
+    set(E.fRing2, { opacity: interp(RING2, age) });
     set(E.fGlasses, { opacity: interp(GLASSES, age) });
-    set(E.fCane, { opacity: interp(CANE, age) });
-    set(E.fShadow, { cx, cy: g + 1, rx: 50 * k });
+    set(E.fShadow, { cx: cx + 4 * k, cy: g + 1, rx: 60 * k });
   }
 
   const FIG = { age: -1, target: 0, label: '', raf: 0 };
