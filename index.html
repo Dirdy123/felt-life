@@ -166,7 +166,7 @@
   .play .why-h { margin-bottom: 10px; }
   .play-sub { margin-top: 0; }
   .stage { display: flex; align-items: flex-end; gap: clamp(16px, 3vw, 40px); margin-top: clamp(28px, 5vh, 48px); }
-  .pfig { height: clamp(100px, 17vh, 170px); width: auto; overflow: visible; flex: none; }
+  .pfig { height: clamp(80px, 13vh, 120px); width: auto; aspect-ratio: 150 / 90; overflow: visible; flex: none; }
   .pcount { font-family: var(--sans); font-weight: 850; font-size: clamp(110px, 17vw, 230px); line-height: .8; letter-spacing: -0.03em; color: var(--blue); margin: 0; font-variant-numeric: tabular-nums; font-stretch: 125%; white-space: nowrap; }
   .pside { display: flex; flex-direction: column; gap: 10px; padding-bottom: 4px; min-width: 7.5em; }
   .dial { width: 44px; height: 44px; display: block; }
@@ -289,10 +289,10 @@
     .tail { grid-template-columns: 1fr; gap: 14px; }
     .tail li { grid-template-columns: 34px auto 1fr; align-items: baseline; gap: 12px; }
     .tail .ti { width: 26px; height: 26px; align-self: center; margin: 0; }
-    .stage { display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 12px 14px; }
-    .pfig { grid-column: 1 / -1; justify-self: start; height: 110px; }
-    .pcount { font-size: clamp(88px, 25vw, 150px); }
-    .pside { min-width: 0; gap: 8px; }
+    .stage { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 10px; }
+    .pfig { flex: none; width: clamp(120px, 40vw, 180px); height: auto; aspect-ratio: 150 / 90; }
+    .pcount { flex: none; font-size: clamp(70px, 21vw, 120px); }
+    .pside { flex: 0 0 100%; min-width: 0; flex-direction: row; align-items: center; gap: 14px; }
     .dial { width: 36px; height: 36px; }
     .pmeta { font-size: 13.5px; }
     .pchap { font-size: 15px; }
@@ -401,7 +401,7 @@
       <h2 class="why-h">Watch your life play out</h2>
       <p class="aside play-sub">Each year plays for as long as it feels.</p>
       <div class="stage" aria-hidden="true">
-        <svg class="pfig" id="pfig" viewBox="0 0 100 200"></svg>
+        <svg class="pfig" id="pfig" viewBox="0 0 150 90"></svg>
         <p class="pcount" id="pcount"><span id="pnum">3</span></p>
         <div class="pside">
           <svg class="dial" viewBox="0 0 40 40">
