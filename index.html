@@ -140,6 +140,9 @@
   .key li { display: inline-flex; align-items: center; gap: 8px; }
   .key i { width: 14px; height: 8px; border-radius: 4px; display: inline-block; }
   .pp { fill: var(--pp, var(--blue)); }
+  .egg { fill: #F6F7FA; stroke: #A3A9B9; stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .eggdot { fill: color-mix(in srgb, var(--blue) 35%, #FFFFFF); }
+  .crack { fill: none; stroke: #6B7080; stroke-width: 1.3; stroke-linejoin: round; stroke-dasharray: 0 1; vector-effect: non-scaling-stroke; }
   .tskin { fill: #DCE0E9; stroke: #A3A9B9; stroke-width: 1; vector-effect: non-scaling-stroke; }
   .tfar { fill: #BEC4D1; }
   .trim { fill: color-mix(in srgb, var(--pp, var(--blue)) 78%, #0E1030); }
@@ -196,7 +199,8 @@
   .play-end { min-height: 3.2em; opacity: 0; transition: opacity .6s ease; }
   .play-end.on { opacity: 1; }
   .play-end strong { font-family: var(--sans); font-weight: 700; color: var(--blue); }
-  .replay { margin-top: 20px; }
+  .play-ctrl { display: flex; align-items: center; gap: 12px 24px; flex-wrap: wrap; margin-top: 20px; }
+  .play-ctrl .share { margin-top: 0; }
   .why-h { font-family: var(--sans); font-weight: 800; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 clamp(32px, 5vh, 52px); }
   .reason-t { font-family: var(--sans); font-size: clamp(18px, 1.8vw, 21px); font-weight: 650; color: var(--blue); margin: 0 0 12px; }
   .reasons { list-style: none; margin: clamp(56px, 9vh, 88px) 0 0; padding: 26px 0 0; border-top: 1.5px solid var(--ink); display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; max-width: 920px; }
@@ -348,6 +352,21 @@
               <path id="fLid" fill="none" stroke="#A3A9B9" stroke-width="1" stroke-linecap="round" d="M1.5 -6.2 Q5 -8 8.5 -6.2"/>
               <g id="fGlasses" fill="none" stroke="#1A1C22" stroke-width="1"><circle cx="5" cy="-3" r="4.6"/><path d="M0.6 -4 L-7 -5.5"/></g>
             </g>
+            <g id="fEggG">
+              <g id="fEggWhole">
+                <path class="egg" d="M0 -22 C12 -22 17 -8 17 1 C17 12 9 21 0 21 C-9 21 -17 14 -17 1 C-17 -8 -12 -22 0 -22 Z"/>
+                <g class="eggdot"><circle cx="-8" cy="10" r="1.3"/><circle cx="6" cy="14" r="1"/><circle cx="11" cy="7" r="1.2"/><circle cx="-6" cy="-13" r="1.2"/><circle cx="7" cy="-9" r="1"/><circle cx="2" cy="-17" r=".9"/></g>
+              </g>
+              <g id="fEggLowG">
+                <path class="egg" d="M-17 1 L-12 -3 L-7 2 L-2 -3 L3 2 L8 -3 L13 2 L17 -1 C17 12 9 21 0 21 C-9 21 -17 14 -17 1 Z"/>
+                <g class="eggdot"><circle cx="-8" cy="10" r="1.3"/><circle cx="6" cy="14" r="1"/><circle cx="11" cy="7" r="1.2"/></g>
+              </g>
+              <g id="fEggTopG">
+                <path class="egg" d="M-17 1 L-12 -3 L-7 2 L-2 -3 L3 2 L8 -3 L13 2 L17 -1 C17 -8 12 -22 0 -22 C-12 -22 -17 -8 -17 1 Z"/>
+                <g class="eggdot"><circle cx="-6" cy="-13" r="1.2"/><circle cx="7" cy="-9" r="1"/><circle cx="2" cy="-17" r=".9"/></g>
+              </g>
+              <path id="fCrack" class="crack" pathLength="1" d="M-17 1 L-12 -3 L-7 2 L-2 -3 L3 2 L8 -3 L13 2 L17 -1"/>
+            </g>
           </svg>
           <p class="fig-label" id="figLabel"></p>
         </div>
@@ -390,7 +409,7 @@
         <div class="lb-bottom"><span class="lb-mark edge-l">Birth</span><span class="lb-mark you" id="lbYou">You</span><span class="lb-mark edge-r" id="lbEnd"></span></div>
       </div>
       <p class="aside play-end" id="playEnd" aria-live="polite"></p>
-      <button class="share replay" id="replay" type="button">Play</button>
+      <div class="play-ctrl"><button class="share replay" id="replay" type="button">Play</button><button class="textbtn" id="sound" type="button" aria-pressed="false">Turn sound on</button></div>
     </section>
 
     <section class="beat shell" id="why">
@@ -701,11 +720,23 @@
 
   function figure(age, E = F) {
     // Parts are drawn once in their own units; age only changes size and a few details
-    const k = interp(HEIGHT, age) / 175 * 0.95, kid = clamp01((12 - age) / 9);
+    // Until about 6 it's an egg: it wobbles and cracks, the top lifts off around 4, a tiny
+    // hatchling climbs out and grows, and the empty shell fades away by about 7.
+    const kGrow = a => interp(HEIGHT, a) / 175 * 0.95;
+    const k = age < 6 ? lerp(0.2, kGrow(6), clamp01((age - 4) / 2)) : kGrow(age), kid = clamp01((12 - age) / 9);
+    const crack = interp([[0, 0], [1, 0], [3.8, 1]], age), lift = interp([[0, 0], [3.8, 0], [4.8, 1]], age);
+    const born = interp([[0, 0], [3.9, 0], [4.5, 1]], age), gone = interp([[0, 0], [5.2, 0], [6.8, 1]], age);
+    const wob = age > 1 && age < 4.2 ? Math.sin(age * 22) * 6 * crack : 0;
     const hs = 1 + 0.55 * kid;                                   // hatchlings have big heads
     const g = 86, cx = 56, droop = interp(DROOP, age);
     E.svg.style.setProperty('--pp', `color-mix(in srgb, var(--pgrey) ${Math.round(interp(FADE, age) * 100)}%, var(--blue))`);
     E.fBodyG.setAttribute('transform', `translate(${cx} ${g}) scale(${k.toFixed(3)})`);
+    set(E.fBodyG, { opacity: born }); set(E.fHeadG, { opacity: born });
+    set(E.fEggG, { transform: `translate(${cx + 4} ${g - 21}) rotate(${wob.toFixed(2)} 0 21)`, opacity: 1 - gone });
+    set(E.fCrack, { style: `stroke-dasharray:${crack.toFixed(3)} 1`, opacity: lift > 0 ? 0 : 1 });
+    // One whole egg until the top lifts, then the two halves take over
+    set(E.fEggWhole, { opacity: lift > 0 ? 0 : 1 }); set(E.fEggLowG, { opacity: lift > 0 ? 1 : 0 });
+    set(E.fEggTopG, { transform: `translate(${(lift * 10).toFixed(2)} ${(-lift * 15).toFixed(2)}) rotate(${(lift * 30).toFixed(2)})`, opacity: lift > 0 ? 1 - interp([[0, 0], [4.6, 0], [5.4, 1]], age) : 0 });
     // Head position in body units: out in front of the shell, lower and tilted down with age
     const hxU = 80 - 9 * kid, hyU = -33 + 6 * kid + droop * 8;
     E.fHeadG.setAttribute('transform', `translate(${(cx + k * hxU).toFixed(2)} ${(g + k * hyU).toFixed(2)}) scale(${(k * hs).toFixed(3)}) rotate(${(droop * 12).toFixed(2)})`);
@@ -722,7 +753,7 @@
     set(E.fRing1, { opacity: interp(RING1, age) });
     set(E.fRing2, { opacity: interp(RING2, age) });
     set(E.fGlasses, { opacity: interp(GLASSES, age) });
-    set(E.fShadow, { cx: cx + 4 * k, cy: g + 1, rx: 60 * k });
+    set(E.fShadow, { cx: cx + 4 * k, cy: g + 1, rx: Math.max(60 * k * born, 17 * (1 - gone)) });
   }
 
   const FIG = { age: -1, target: 0, label: '', raf: 0 };
@@ -993,6 +1024,7 @@
   function playReset() {
     const s = S, R = Math.ceil(s.life), gap = R > 45 ? 1 : 2;
     cancelAnimationFrame(PLAY.raf);
+    soundStop();
     const segs = fut => Array.from({ length: R }, (_, a) =>
       `<i class="${a + 1 <= s.mem ? 'pre' : (fut && a + 1 > s.age ? 'fut' : '')}"></i>`).join('');
     $('lbBase').innerHTML = segs(false); $('lbFill').innerHTML = segs(true);
@@ -1050,6 +1082,48 @@
     $('lbYou').classList.remove('now');
     $('replay').textContent = 'Play it again';
   }
+  // Optional ticking: one tick per year, scheduled on the audio clock so it stays in time
+  // with the playback. Off until the visitor turns it on (browsers block sound before a click).
+  const SND = { on: false, ctx: null, bus: null };
+  function soundStop() {
+    if (SND.bus) { try { SND.bus.disconnect(); } catch (e) {} SND.bus = null; }
+  }
+  function tone(t, freq, type, peak, decay) {
+    const c = SND.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+    o.connect(g); g.connect(SND.bus);
+    o.start(t); o.stop(t + decay + 0.02);
+  }
+  function scheduleSound(s, fYou) {
+    soundStop();
+    const c = SND.ctx;
+    SND.bus = c.createGain(); SND.bus.gain.value = 0.6; SND.bus.connect(c.destination);
+    const t0 = c.currentTime + 0.05, hold = fYou > 0 ? HOLD / 1000 : 0, lnT = Math.log(s.life / s.mem);
+    for (let a = Math.floor(s.mem) + 1; a <= Math.floor(s.life); a++) {
+      const f = Math.log(a / s.mem) / lnT;
+      const t = t0 + PT / 1000 * f + (fYou > 0 && f > fYou ? hold : 0);
+      tone(t, a % 2 ? 1500 : 2000, 'triangle', 0.25, 0.05);
+    }
+    const bell = t => { tone(t, 880, 'sine', 0.18, 1.6); tone(t, 1320, 'sine', 0.08, 1.2); };
+    if (fYou > 0) bell(t0 + PT / 1000 * fYou);
+    bell(t0 + PT / 1000 + hold);
+  }
+  $('sound').addEventListener('click', () => {
+    SND.on = !SND.on;
+    $('sound').setAttribute('aria-pressed', SND.on);
+    $('sound').textContent = SND.on ? 'Turn sound off' : 'Turn sound on';
+    if (SND.on) {
+      try {
+        SND.ctx = SND.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        if (SND.ctx.state === 'suspended') SND.ctx.resume();
+      } catch (e) { SND.on = false; return; }
+      play();
+    } else soundStop();
+  });
+
   function play() {
     const s = S;
     if (!s) return;
@@ -1057,6 +1131,7 @@
     $('replay').textContent = 'Restart';
     if (reduced) { playFrame(s.life, 1); playEnd(); return; }
     const fYou = s.age > s.mem && s.age < s.life ? s.felt(s.age) : 0, t1 = PT * fYou;
+    if (SND.on && SND.ctx) scheduleSound(s, fYou);
     const t0 = performance.now();
     const step = now => {
       let e = Math.max(0, now - t0);
