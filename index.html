@@ -130,7 +130,7 @@
   .switch { font-family: var(--sans); position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
   .switch::before {
     content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
-    background: var(--ink); border-radius: 999px; transition: transform .6s cubic-bezier(.65,0,.35,1);
+    background: var(--ink); border-radius: 999px; transition: transform .45s cubic-bezier(.65,0,.35,1);
   }
   .switch[data-mode="cal"]::before { transform: translateX(100%); }
   .switch button {
@@ -969,7 +969,7 @@
     cancelAnimationFrame(tRaf);
     if (sweep < 1) { cancelAnimationFrame(sRaf); sweep = 1; figTo(S.age, youLabel()); }
     if (reduced) { t = target; draw(); return; }
-    const from = t, t0 = performance.now(), dur = 1500;
+    const from = t, t0 = performance.now(), dur = 750;
     const step = now => {
       const p = clamp01((now - t0) / dur);
       t = p >= 1 ? target : from + (target - from) * ease(p);
@@ -981,7 +981,7 @@
 
   function playSweep() {
     if (reduced) { sweep = 1; draw(); figSet(S.age, youLabel()); return; }
-    const t0 = performance.now(), dur = 2000;
+    const t0 = performance.now(), dur = 4000;
     const step = now => {
       const p = clamp01((now - t0) / dur);
       sweep = p >= 1 ? 1 : ease(p);
