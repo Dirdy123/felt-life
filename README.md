@@ -21,7 +21,7 @@ This is a thought experiment, not a measurement. The "How it works" panel on the
 
 ## How it's built
 
-One static `index.html` with no build step and no third-party requests, served by GitHub Pages. Everything is calculated in the browser; nothing entered is sent anywhere. The fonts (Archivo and Newsreader, SIL Open Font License) are served from `fonts/`, and `og.png` is the link preview image.
+One static `index.html` with no build step, served by GitHub Pages. Everything is calculated in the browser; nothing entered is sent anywhere. The only outside request is a cookie-free visitor counter (GoatCounter). The fonts (Archivo and Newsreader, SIL Open Font License) are served from `fonts/`, and `og.png` is the link preview image.
 
 To run it locally, open `index.html` in a browser.
 

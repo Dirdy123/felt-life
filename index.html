@@ -110,6 +110,13 @@
     -moz-appearance: textfield; appearance: textfield;
   }
   .madlib input::-webkit-outer-spin-button, .madlib input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .madlib select {
+    font-family: var(--sans); font-size: .92em; font-weight: 750; color: var(--blue); cursor: pointer;
+    background: transparent; border: 0; border-bottom: 3px solid var(--blue); border-radius: 0; padding: 0 2px; margin: 0 3px;
+    -webkit-appearance: none; appearance: none;
+  }
+  .madlib select.empty { color: var(--muted); font-weight: 500; font-size: .8em; border-bottom-color: var(--line); }
+  .madlib select:focus { outline: none; background: color-mix(in srgb, var(--blue) 12%, transparent); }
   .madlib input:focus { outline: none; background: color-mix(in srgb, var(--blue) 12%, transparent); }
   .go {
     font-family: var(--sans); margin-top: clamp(28px, 4vh, 44px); background: var(--blue); color: var(--on-blue); border: 0; cursor: pointer;
@@ -227,7 +234,12 @@
   .end { padding-block: clamp(110px, 22vh, 220px) clamp(80px, 14vh, 140px); }
   .left { font-family: var(--sans); margin: 0; font-weight: 850; font-size: clamp(56px, 10vw, 150px); line-height: .9; letter-spacing: -0.03em; font-stretch: 62%; }
   .left b { color: var(--blue); font-weight: 850; }
-  .end .aside { margin-top: 20px; }
+  .end .aside { margin-top: 28px; }
+  .tail { list-style: none; margin: clamp(28px, 5vh, 44px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 20px clamp(32px, 6vw, 88px); }
+  .tail li { display: grid; grid-template-columns: auto; gap: 6px; }
+  .tail .ti { width: 30px; height: 30px; color: var(--blue); margin-bottom: 4px; }
+  .tail b { font-family: var(--sans); font-weight: 850; font-stretch: 62%; font-size: clamp(44px, 6.2vw, 84px); line-height: .9; letter-spacing: -0.02em; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .tail span { font-size: clamp(18px, 1.8vw, 22px); color: var(--ink-2); }
   .share { font-family: var(--sans); margin-top: 36px; background: none; border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 22px; font-size: 16px; font-weight: 600; cursor: pointer; }
   .share:hover { background: var(--ink); color: var(--ground); }
 
@@ -281,6 +293,9 @@
     .fig-label { min-width: 0; margin: 0; font-size: 13px; }
     .finds li { grid-template-columns: 1fr; padding: 22px 0; }
     .reasons { grid-template-columns: 1fr; }
+    .tail { grid-template-columns: 1fr; gap: 14px; }
+    .tail li { grid-template-columns: 34px auto 1fr; align-items: baseline; gap: 12px; }
+    .tail .ti { width: 26px; height: 26px; align-self: center; margin: 0; }
     .stage { display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 12px 14px; }
     .pfig { grid-column: 1 / -1; justify-self: start; height: 110px; }
     .pcount { font-size: clamp(88px, 25vw, 150px); }
@@ -312,6 +327,7 @@
       <p>I'm <input id="age" type="number" inputmode="decimal" min="0" max="120" step="1" value="30" aria-label="Your age in years">
          and expect to live to <span class="nw"><input id="life" type="number" inputmode="decimal" min="2" max="120" step="1" value="80" aria-label="Expected lifespan in years">.</span></p>
       <p>My earliest memory is from <span class="nw">age <input id="mem" type="number" inputmode="decimal" min="1" max="20" step="1" value="3" aria-label="Age of your earliest memory">.</span></p>
+      <p>I was born in <span class="nw"><select id="month" class="empty" aria-label="Birth month (optional)"><option value="">month (optional)</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select>.</span></p>
       <button class="go" type="submit">Show my life</button>
       <p class="error" id="error" role="alert"></p>
     </form>
@@ -463,7 +479,12 @@
 
     <section class="end shell">
       <p class="left" id="left"></p>
-      <p class="aside" id="leftAside">This is one of them. Close this tab and go live it.</p>
+      <ul class="tail" id="tail">
+        <li><svg class="ti" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="5.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M6.8 25.2l2.8-2.8M22.4 9.6l2.8-2.8"/></g></svg><b data-n="summers">0</b><span>summers</span></li>
+        <li><svg class="ti" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="currentColor"/><g fill="var(--ground)" opacity=".35"><circle cx="12" cy="13" r="2.4"/><circle cx="19.5" cy="19" r="3"/><circle cx="19" cy="10.5" r="1.4"/></g></svg><b data-n="moons">0</b><span>full moons</span></li>
+        <li><svg class="ti" viewBox="0 0 32 32" aria-hidden="true"><path d="M8 23a8 8 0 0 1 16 0Z" fill="currentColor"/><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 26.5h26M16 7v4M5.5 12.5l2.8 2.8M26.5 12.5l-2.8 2.8"/></g></svg><b data-n="sunrises">0</b><span>sunrises</span></li>
+      </ul>
+      <p class="aside" id="leftAside">This week is one of them. Close this tab and go live it.</p>
       <button class="share" id="share" type="button">Share my result</button>
       <p class="share-note" id="shareNote" role="status"></p>
     </section>
@@ -488,7 +509,7 @@
     <p>A year feels as long as the share of your life it makes up. At 5, a year is a fifth of everything you've lived. At 50, it's a fiftieth. The philosopher Paul Janet described this in 1877.</p>
     <p>Add up a lifetime of shrinking years and you get a logarithm. The count starts at your earliest memory, because that's where the life you can look back on begins:</p>
     <div class="formula">felt so far = ln(age ÷ first memory) ÷ ln(lifespan ÷ first memory)</div>
-    <p>Everything is calculated in your browser. Nothing you enter is sent anywhere.</p>
+    <p>Everything is calculated in your browser. Nothing you enter is sent anywhere. A simple visitor counter (GoatCounter) counts page visits without cookies or personal data.</p>
 
     <h3 id="accuracy">How accurate is this?</h3>
     <p>Treat the percentage as a thought experiment, not a measurement. Here's what the evidence does and doesn't support.</p>
@@ -575,7 +596,8 @@
     if (life < 2 || life > 120) return { err: 'Enter a lifespan between 2 and 120.' };
     if (mem < 1 || mem > 20) return { err: 'Enter an earliest memory between age 1 and 20.' };
     if (mem >= life) return { err: 'Your earliest memory has to come before the lifespan you expect.' };
-    return { age, life, mem };
+    const month = parseInt($('month').value, 10) || null;
+    return { age, life, mem, month };
   }
 
   // ---------- Inputs ----------
@@ -592,6 +614,11 @@
     });
   });
 
+  $('month').addEventListener('change', () => {
+    $('month').classList.toggle('empty', !$('month').value);
+    if (S) apply(false);
+  });
+
   $('form').addEventListener('submit', e => {
     e.preventDefault();
     if (apply(true)) $('reveal').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
@@ -602,8 +629,9 @@
     $('error').textContent = r.err || '';
     if (r.err) return false;
     S = model(r.age, r.life, r.mem);
+    S.month = r.month;
     LAYERS = null;
-    try { history.replaceState(null, '', `#age=${r.age}&life=${r.life}&mem=${r.mem}`); } catch (e) {}
+    try { history.replaceState(null, '', `#age=${r.age}&life=${r.life}&mem=${r.mem}${r.month ? `&month=${r.month}` : ''}`); } catch (e) {}
     $('story').hidden = false;
     if (fresh && !played) sweep = 0;
     size();
@@ -650,16 +678,37 @@
     const left = Math.max(0, s.totalWeeks - s.livedWeeks);
     if (left > 0) {
       $('left').innerHTML = `<b>${fmt(left)}</b> weeks left.`;
-      $('leftAside').textContent = 'This is one of them. Close this tab and go live it.';
+      $('leftAside').textContent = 'This week is one of them. Close this tab and go live it.';
     } else {
       $('left').innerHTML = `Every week is <b>extra</b> now.`;
       $('leftAside').textContent = 'Including this one. Close this tab and go live it.';
     }
+    // What's left, counted differently (after Tim Urban's "The Tail End")
+    const rest = Math.max(0, s.life - s.age);
+    TAIL.target = { summers: Math.round(rest), moons: Math.round(rest * 12.37), sunrises: Math.round(rest * 365.25) };
+    $('tail').hidden = rest <= 0;
+    if (TAIL.shown) tailShow(1);
     const f = Math.round(s.felt(s.age) * 100), c = Math.round(s.clock(s.age) * 100);
     const sq = s.age <= s.mem ? 0 : clamp01((Math.sqrt(s.age) - Math.sqrt(s.mem)) / (Math.sqrt(s.life) - Math.sqrt(s.mem)));
     $('sqrtPct').textContent = Math.round(sq * 100) + '%';
     $('logPct').textContent = f + '%';
     $('grid').setAttribute('aria-label', `A grid of your weeks. By how it feels, ${f}% of your life is already behind you. On the calendar, ${c}% has passed.`);
+  }
+
+  const TAIL = { target: null, shown: false };
+  function tailShow(p) {
+    document.querySelectorAll('#tail b').forEach(b => { b.textContent = fmt(TAIL.target[b.dataset.n] * p); });
+  }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting || TAIL.shown || !TAIL.target) return;
+      TAIL.shown = true;
+      if (reduced) return tailShow(1);
+      const t0 = performance.now();
+      const step = now => { const p = clamp01((now - t0) / 1400); tailShow(1 - Math.pow(1 - p, 3)); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+      setTimeout(() => tailShow(1), 1700);
+    }), { threshold: 0.5 }).observe($('tail'));
   }
 
   // Age reached by the first fill. Stepping evenly through felt time makes the fill
@@ -1047,10 +1096,17 @@
     el.style.transform = x < 0.08 ? 'none' : x > 0.92 ? 'translateX(-100%)' : '';
   }
   // Calendar year at a given age, from today's date and the age entered
+  // With a birth month the years are exact; without one they're estimated from today's date.
   function yearAt(age) {
-    const now = new Date(), start = new Date(now.getFullYear(), 0, 1);
-    const nowFrac = now.getFullYear() + (now - start) / (365.25 * 864e5);
-    return Math.floor(nowFrac - S.age + age);
+    const now = new Date();
+    let birth;
+    if (S.month) {
+      const turned = now.getMonth() + 1 >= S.month;
+      birth = now.getFullYear() - Math.floor(S.age) - (turned ? 0 : 1) + (S.month - 0.5) / 12;
+    } else {
+      birth = now.getFullYear() + (now - new Date(now.getFullYear(), 0, 1)) / (365.25 * 864e5) - S.age;
+    }
+    return Math.floor(birth + age);
   }
   function chapter(a) {
     if (a < 6) return 'Early childhood';
@@ -1193,10 +1249,12 @@
   const h = new URLSearchParams(location.hash.slice(1));
   if (h.has('age') && h.has('life') && h.has('mem')) {
     $('age').value = h.get('age'); $('life').value = h.get('life'); $('mem').value = h.get('mem');
+    if (h.get('month')) { $('month').value = h.get('month'); $('month').classList.toggle('empty', !$('month').value); }
     inputs.forEach(fit);
     apply(true);
   }
 })();
 </script>
+<script data-goatcounter="https://thespeedofyears.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
