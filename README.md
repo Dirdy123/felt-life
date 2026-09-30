@@ -1,7 +1,7 @@
 # The Speed of Years
 
 **How much of your life have you already felt?**
-Live: https://dirdy123.github.io/felt-life/
+Live: https://madebyjs8.github.io/felt-life/
 
 Enter your age, the age you expect to live to, and the age of your earliest memory. The page then shows:
 
@@ -29,4 +29,4 @@ To run it locally, open `index.html` in a browser.
 
 Inspired by Tim Urban's *Your Life in Weeks* and Maximilian Kiener's *Why Time Flies*. Full sources are listed in the site's "How it works" panel.
 
-Feedback and ideas: [open an issue](https://github.com/Dirdy123/felt-life/issues).
+Feedback and ideas: [open an issue](https://github.com/madebyjs8/felt-life/issues).
