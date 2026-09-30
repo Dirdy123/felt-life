@@ -1,7 +1,7 @@
 # The Speed of Years
 
 **How much of your life have you already felt?**
-Live: https://madebyjs8.github.io/felt-life/
+Live: https://speedofyears.com/
 
 Enter your age, the age you expect to live to, and the age of your earliest memory. The page then shows:
 
